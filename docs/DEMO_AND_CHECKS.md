@@ -1,6 +1,6 @@
 # Demo, checks, and evaluator evidence
 
-Everything here is a planned check until an actual result is recorded. Do not pre-check boxes. Store generated evidence in docs/evidence/ and exclude secrets/customer data.
+The entries below record actual local checks from 2026-10-31. No external portal or video submission is represented as complete. No generated database or secret is stored in Git.
 
 ## Hard deadlines and initial repository submission
 
@@ -23,22 +23,46 @@ Creating local documents does not complete these remote submission steps.
 
 | Area | Minimum meaningful checks | Actual result/evidence |
 | --- | --- | --- |
-| Setup | Fresh install/migrate/seed/run; seed repeat safe | Not run |
-| Auth | Case-insensitive email collision; exact password rule; reset flow | Not run |
-| Access | Admin-only writes; direct endpoint checks; two-customer isolation | Not run |
-| Catalog | Variant pricing, quantities, rates, availability and archive | Not run |
-| Quotes | Independent template copy; validity deadline; status transitions | Not run |
-| Lifecycle | Pause/resume/close/renew flags; expiry; dates; no overlap | Not run |
-| Billing | Duplicate/concurrent run, rollback, catch-up, calendar anchor, final proration | Not run |
-| Discounts | Scope/minimums/date boundaries, exact allocation, concurrent usage limit | Not run |
-| Snapshots | Historical identity, prices, taxes and discount unchanged by edits | Not run |
-| Payments | Partial/full, replay, concurrent overpay prevention, overdue | Not run |
-| Send/print | Correct snapshot totals and ownership; honest delivery mode | Not run |
-| Dashboard | Cash/outstanding/overdue/MRR reconcile; empty data and filters | Not run |
-| UI | 390/768/1440px, keyboard, focus, reduced motion, useful errors | Not run |
-| Offline | Local assets/db/email fallback; no network needed after install | Not run |
-| Performance | 5,000 subscriptions plus related records; server and browser measurements | Not run |
-| Git | Each contributor's actual branches, commits, PR reviews | Not available yet |
+| Setup | Fresh install/migrate/seed/run; seed repeat safe | Fresh `/tmp/brightloop-scale.sqlite3` migration passed; `seed_demo` created 3 local accounts; `seed_scale --subscriptions 5000` created 5,000 subscriptions, invoices and lines plus 2,500 payments. Seed repeat is covered by `tests.test_seed_scale`; all local DBs remained outside Git. |
+| Auth | Case-insensitive email collision; exact password rule; reset flow | `tests.test_auth`: 7 tests passed, including normalized duplicate email, password rule, reset token one-use, and POST+CSRF logout. |
+| Access | Admin-only writes; direct endpoint checks; two-customer isolation | Auth, catalog, team, customer, payment, template and portal access tests pass; portal foreign IDs return 404. Full suite below. |
+| Catalog | Variant pricing, quantities, rates, availability and archive | `tests.test_catalog`: 10 tests passed, including paise conversion, variant-product matching, tax basis points, eligibility and archive behavior. |
+| Quotes | Independent template copy; validity deadline; status transitions | `tests.test_templates` (6) and subscription view tests (4) passed; template edits do not change copied lines, template validity sets quote expiry, expired quote cannot confirm. |
+| Lifecycle | Pause/resume/close/renew flags; expiry; dates; no overlap | `tests.test_lifecycle`: 6 tests passed for legal transitions, snapshots, expired quotes, pause settlement, resume boundary reanchor and idempotent renewal. Portal flag/ownership tests also pass. |
+| Billing | Duplicate/concurrent run, rollback, catch-up, calendar anchor, final proration | `tests.test_billing` passed with duplicate period, cursor, bounded catch-up, rollback, tax and terminal proration checks. `tests.test_concurrency` passed separately on an on-disk SQLite test database: same-period concurrent billing created one invoice and advanced once. |
+| Discounts | Scope/minimums/date boundaries, exact allocation, concurrent usage limit | `tests.test_discounts` (12) passed. Concurrent competing invoices in `tests.test_concurrency` reserved the max-use-one discount once. |
+| Snapshots | Historical identity, prices, taxes and discount unchanged by edits | Billing/discount/template/delivery tests confirm saved snapshots remain stable under source edits and render from saved invoice data. |
+| Payments | Partial/full, replay, concurrent overpay prevention, overdue | `tests.test_payments` (5) passed; on-disk concurrency suite confirmed two distinct 7,000-paise attempts against a 10,000-paise balance result in only one payment. |
+| Send/print | Correct snapshot totals and ownership; honest delivery mode | `tests.test_delivery` (4) passed for sendable states, address/backend failure, snapshot print and customer isolation. Configured email backend is console by default. |
+| Dashboard | Cash/outstanding/overdue/MRR reconcile; empty data and filters | `tests.test_reporting` (4) passed for hand-calculated metrics, customer scope, invalid filters and empty values. Scale benchmark found and led to removal of portal dashboard N+1 balance queries (206 to 8). |
+| UI | 390/768/1440px, keyboard, focus, reduced motion, useful errors | Local browser rendered customer dashboard at its available 890×921 viewport. CSS/JS implement responsive drawer, Escape/focus handling, 44×44 menu target, and reduced motion. Exact 390/768/1440 screenshots and full keyboard/contrast audit remain unverified. |
+| Offline | Local assets/db/email fallback; no network needed after install | Static styles/scripts are local; Django console email default. Fresh offline install was not tested (dependency packages may require package access). |
+| Performance | 5,000 subscriptions plus related records; server and browser measurements | Backend measurement passed all five routes under 2s; details below. Full browser rendering and concurrent load were not measured. |
+| Git | Each contributor's actual branches, commits, PR reviews | Remote refs read successfully: `dev`=`4ac7968`; default=`plan-submission-17140653490169652980`. Local implementation commit `0b436d9` is on `codex/remaining-core` using the repository-configured author. No PR/review or separate human teammate commits are recorded; branch merge/push remains pending. |
+
+## Integrated verification — 2026-10-31
+
+- Latest `./.venv/bin/python manage.py test --verbosity 1`: 96 tests discovered, suite passed; 3 concurrency tests were skipped because this default run uses Django's shared in-memory SQLite test database. The dedicated on-disk concurrency suite passed all 3.
+- `TEST_DATABASE_PATH=/tmp/brightloop-concurrency.sqlite3 ./.venv/bin/python manage.py test tests.test_concurrency --verbosity 1`: 3 concurrent billing, discount-capacity, and distinct-payment tests passed against the temporary on-disk SQLite database.
+- `manage.py check`: passed with zero issues.
+- `manage.py makemigrations --check --dry-run`: passed; no migration changes detected.
+- `git diff --check`: passed. `node --check static/js/app.js`: passed.
+- `tests.test_subscription_views` (5) and `tests.test_templates` (6): passed after adding visible editable manual quote expiry with a seven-day default and verifying the template validity override.
+- Initial benchmark harness attempts returned HTTP 400 because Django's test client used disallowed host `testserver`; after using allowed `localhost`, `/dashboard/` returned 404 because the dashboard is mounted at `/`. The harness now uses `/`; final successful results follow. These were harness/path errors, not route performance results.
+
+## Performance record — 2026-10-31 11:22 IST
+
+Recorded with `manage.py benchmark_pages --warm-samples 10` on macOS 26.7.1 arm64, Python 3.12.14, Django 5.2.18, SQLite, 5,000 subscriptions, 5,000 invoices, 5,000 invoice lines and 2,500 payments. Routes were authenticated local Django test-client GET requests; timings include server-side rendering but not browser layout/paint or network latency. The browser itself was visually inspected at its available 890×921 viewport, but no browser-navigation timing was collected.
+
+| Route / role | HTTP | Cold time / queries | Warm query count | 10 warm requests: median / max | Under 2s |
+| --- | --- | --- | --- | --- | --- |
+| Dashboard `/` / admin | 200 | 0.0431s / 16 | 16 | 0.0206s / 0.0215s | Pass |
+| Subscriptions `/subscriptions/` / admin | 200 | 0.0044s / 4 | 4 | 0.0033s / 0.0041s | Pass |
+| Invoices `/invoices/` / admin | 200 | 0.0039s / 4 | 4 | 0.0030s / 0.0034s | Pass |
+| Customer detail `/customers/1/` / admin | 200 | 0.0033s / 5 | 5 | 0.0021s / 0.0022s | Pass |
+| Portal `/portal/` / customer | 200 | 0.0064s / 8 | 8 | 0.0046s / 0.0049s | Pass |
+
+Times are local single-process checks on this machine; they do not establish production capacity. The initial portal measurement was 206 queries; balance subqueries/aggregates reduced it to 8 before this final run.
 
 ## S0 verification checkpoint — 2026-10-31 09:53 IST
 

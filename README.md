@@ -2,7 +2,7 @@
 
 Hackathon project for managing products, recurring plans, quotations, subscriptions, invoices, discounts, payments, and customer self-service.
 
-**Current status: S0 foundation complete.** The project boots, its full initial schema migrates, demo roles seed idempotently, and navigation renders honest placeholder screens. S1 authentication, the catalog and all subscription, billing, discount, payment, reporting, and portal features have not been implemented. See the live [handoff](docs/TEAM_HANDOFF.md) and [progress log](docs/HACKATHON_LOG.md).
+**Current status: core workflows implemented and locally verified.** Authentication, catalog management, quotation templates, subscription lifecycle, recurring billing, discounts, payments, invoice delivery/print, reporting, and the customer portal are database-backed and role-scoped. `manage.py test` passes 96 tests (three dedicated concurrency tests are skipped in the shared in-memory test database and pass separately on an on-disk test DB). A 5,000-subscription backend benchmark passed the 2-second route target. The 390/768/1440 visual checks, browser rendering performance, and human Git contribution/review evidence remain incomplete. See [requirements](docs/REQUIREMENTS.md), [demo/check evidence](docs/DEMO_AND_CHECKS.md), the [handoff](docs/TEAM_HANDOFF.md), and [progress log](docs/HACKATHON_LOG.md).
 
 ## Start here
 
@@ -41,7 +41,7 @@ The UI will use a light workspace, plum navigation, teal accents, readable finan
 - Planned times are not actual completion timestamps. Actual progress belongs in the [hackathon log](docs/HACKATHON_LOG.md).
 - Akilan is the provisional portal submitter; repository owner handles evaluator access. The 17:00–17:30 period is for the frozen-build video and submission, not additional coding.
 
-## Run the S0 preview
+## Run the local application
 
 Verified with Python 3.12.14 and Django 5.2.18. Create a virtual environment, install the pinned requirement, migrate and run the placeholder UI:
 
@@ -50,16 +50,19 @@ python3.12 -m venv .venv
 . .venv/bin/activate
 python -m pip install -r requirements.txt
 python manage.py migrate
+python manage.py seed_demo
 python manage.py runserver
 ```
 
-`python manage.py seed_demo` creates local demo users for the three roles. Choose one shared local-only password when prompted; it must have at least nine characters, uppercase and lowercase letters, and a special character. The command does not print or reset passwords. Its emails are `admin@brightloop.test`, `staff@brightloop.test`, and `customer@brightloop.test`.
+`seed_demo` creates local demo users for the three roles. Choose one local-only password when prompted; it must have at least nine characters, uppercase and lowercase letters, and a special character. The command does not print or reset existing passwords. Its emails are `admin@brightloop.test`, `staff@brightloop.test`, and `customer@brightloop.test`. Email defaults to the console backend; actual SMTP delivery needs environment configuration. Billing is available through the management command and staff POST action; no external scheduler or payment gateway is configured.
 
-**Current preview limitation:** feature URLs intentionally show “Not implemented yet” placeholders. Demo accounts do not enable application login until S1. Billing, scale-seed, benchmark, payment, and feature test commands are planned but do not exist yet. Do not imply the preview is the finished subscription system.
+To create a repeat-safe local benchmark dataset, run `python manage.py seed_scale --subscriptions 5000` after `seed_demo`, then measure authenticated routes with `python manage.py benchmark_pages --warm-samples 10`. These commands write only to the configured local database. Run the full unit/integration suite with `python manage.py test`; run real concurrent-write checks against a temporary on-disk test DB with `TEST_DATABASE_PATH=/tmp/brightloop-concurrency.sqlite3 python manage.py test tests.test_concurrency`.
+
+**Known limitations:** responsive browser screenshots at 390, 768, and 1440 px have not been captured; the 5,000-record timings measure Django request handling, not full browser rendering or concurrent load. Delivery uses the configured Django email backend; no background scheduler, live payment gateway, refunds, or credit notes are implemented. Portal submission, evaluator access, final Git integration/push, and video submission are tracked separately and remain unverified.
 
 ## Evaluation evidence
 
-All completion claims should link to actual commits, PRs, screenshots, or captured check results. Initial S0 verification results are in [the hackathon log](docs/HACKATHON_LOG.md); feature requirements still pending are tracked in [requirements](docs/REQUIREMENTS.md). Local seed accounts are demonstration accounts; actual email delivery, concurrency, and performance must be described according to what was actually verified.
+All completion claims should link to actual commits, PRs, screenshots, or captured check results. Current results and limitations are in [the demo/check record](docs/DEMO_AND_CHECKS.md) and [requirements](docs/REQUIREMENTS.md). The feature implementation is on local branch `codex/remaining-core` at commit `0b436d9`; remote `dev` was verified at `4ac7968` before integration. The feature commit has not been merged or pushed yet.
 
 ## Source material
 

@@ -19,5 +19,34 @@ Role: solo morning spine; afternoon reviews/integration/shared code. Branch targ
 - **Limitations:** No feature implementation beyond S0; portal submission and evaluator invitations remain unverified.
 - **Next:** Teammates use `dev` as the shared base; resume only the task assigned by the participant.
 
+## 2026-10-31 11:23 IST — S1–S5 integration checkpoint
+
+- **Cards:** Lead-owned S1–S5 and I1 integration of T1A/B, T2A/B, T3A/B.
+- **Work:** Integrated all database-backed auth/catalog/subscription/billing/discount/payment/reporting/portal flows; added quotation-template copying, customer detail, a repeat-safe 5,000-row scale command and local page benchmark. Fixed portal dashboard N+1 balance lookups after the scale run measured 206 queries; final portal query count is 8.
+- **Checks:** Full default `manage.py test` passed 92 tests (3 concurrency tests skipped on the shared in-memory SQLite database); the 3 dedicated concurrency tests passed on an on-disk temp DB. `manage.py check`, migration drift check, `git diff --check`, JS syntax check, fresh temp migration and seed passed.
+- **Scale evidence:** 5,000 subscriptions, 5,000 invoices, 5,000 invoice lines and 2,500 payment rows. Ten warm local request measurements all below 2s: dashboard 0.0206/0.0215s, subscriptions 0.0033/0.0041s, invoices 0.0030/0.0034s, customer detail 0.0021/0.0022s, portal 0.0046/0.0049s (median/max). Environment/queries and harness failures recorded in `../DEMO_AND_CHECKS.md`.
+- **UI:** Local customer dashboard was visually inspected at 890×921; narrow 390, 768, and wide 1440 viewport captures remain pending. Focus target is 44×44; existing shared JS handles Escape/focus return and CSS supports reduced motion by code inspection.
+- **Git:** Remote `dev` read-verified at `4ac7968`, default `plan-submission-17140653490169652980`; neither changed. Local work remains on `codex/remaining-core`, without new commit, merge, or push at this checkpoint. No human author/reviewer identities are inferred.
+- **Next:** Finish final review, record actual final checks, commit coherent feature increments with transparent automation authorship if used, and integrate/push only to verified `dev` before 17:00 IST. Do not modify the remote default branch. External submission/video status remains for the authorized submitter to verify.
+
+## 2026-10-31 11:24 IST — Lifecycle acceptance follow-up
+
+- **Changed:** Added expiry, pause/resume boundary, early-close renewal and idempotency assertions; added the customer detail route used by the benchmark, recorded current touch-target correction, and configured optional on-disk SQLite test DB support for thread tests.
+- **Checks:** Full suite: 95 discovered, passed with 3 on-disk concurrency cases skipped on in-memory test DB. Dedicated concurrency run: 3 passed. `manage.py check`, no-migration check, diff whitespace, and JS syntax passed.
+- **Limitations/next:** 390/768/1440 visual check remains pending. Remote `dev` remains verified at `4ac7968`; current feature branch still needs commits and integration. Never write the default branch.
+
+## 2026-10-31 11:26 IST — Quote expiry form acceptance
+
+- **Changed:** Manual draft forms now expose quote expiry with a visible seven-day default; templates override that date using their selected validity when issuing a quotation. Added direct view coverage.
+- **Checks:** Full suite passed with 96 discovered and 3 in-memory concurrency skips; separate on-disk concurrency suite passed 3. Subscription/template focused tests passed 11; check, no-migration check, diff whitespace and JS syntax passed.
+- **Next:** Stage/commit the integrated implementation and evidence, then merge/push to verified `dev` before the cutoff. Preserve `main` and the remote default branch.
+
+## 2026-10-31 11:27 IST — Local feature commit
+
+- **Branch/commit:** `codex/remaining-core`, `0b436d9a9495fe99f43b929224301603935a6687` (`feat: implement Brightloop subscription workflows`). Uses the repository-configured author; implementation was automation-assisted, with no separate teammate commit/PR/review attributed.
+- **Contents:** 120 app, template, CSS and test files. No generated DB, environment, cache or credential was added.
+- **Checks:** Before commit, all 96 tests passed with three in-memory concurrency skips; dedicated on-disk concurrency suite passed 3; Django check, no-migration check, whitespace and JS syntax checks passed.
+- **Git state:** `origin/dev` fetched at `4ac7968`, matching local `dev`. The remote default branch was not touched. Feature commit remains local pending docs commit and push.
+
 Entry format: IST timestamp; card; what changed/why; files; checks/results; commit/PR; blocker; next owner/action.
 

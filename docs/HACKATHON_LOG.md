@@ -46,6 +46,36 @@ All times are Asia/Kolkata (IST). Planned times are kept in the implementation p
 - **Limit:** The app remains at S0; feature pages are placeholders. Portal submission and evaluator collaborator invitations are unverified.
 - **Next:** Teammates branch from `dev`; continue with the next explicitly assigned card.
 
+## 2026-10-31 11:23 IST — Feature workflow integration and scale verification
+
+- **Owner:** Lead integration; implementation slices were delegated to agents in the shared checkout. No human contributor identity, review, or Git activity is attributed by this entry.
+- **Implemented:** S1 authentication/reset and role enforcement; S2 catalog forms; S3 subscription drafts/lifecycle and quotation template copy; S4 recurring invoice billing/state helpers and command; T1A discount rules and T1B template CRUD/picker; T2A payment recording and T2B send/print; T3A dashboard/API and T3B scoped portal; S5 repeat-safe `seed_scale` and authenticated `benchmark_pages`. Added customer detail and improved portal dashboard balances with SQL aggregation after the scale run found an N+1.
+- **Checks:** `manage.py test` found 92 tests and passed, with 3 concurrency tests skipped because that run used Django's shared in-memory SQLite. `TEST_DATABASE_PATH=/tmp/brightloop-concurrency.sqlite3 manage.py test tests.test_concurrency` separately passed all 3: concurrent duplicate billing, one-use discount reservation, and overpayment attempts. `manage.py check`, migration drift check, `git diff --check`, and `node --check static/js/app.js` passed. Fresh temporary DB migration/seed passed; scale command added 5,000 subscriptions, 5,000 invoices, 5,000 lines and 2,500 payments.
+- **Performance:** At 11:22 IST on macOS 26.7.1 arm64, Python 3.12.14, Django 5.2.18, SQLite, ten warm local Django test-client requests per route: dashboard 0.0206s median/0.0215s max (16 queries); subscriptions 0.0033/0.0041s (4); invoices 0.0030/0.0034s (4); customer detail 0.0021/0.0022s (5); portal 0.0046/0.0049s (8). All passed the <2s backend target. This excludes browser render/paint, network latency and concurrent load. An initial harness attempt failed with disallowed `testserver`; a second used a nonexistent `/dashboard/` path. The host and root dashboard path were corrected before the successful run.
+- **Remote/Git:** Read-only remote inspection confirmed `dev` remained `4ac7968` and default branch remained `plan-submission-17140653490169652980`; neither was changed. Work is on local `codex/remaining-core`; no code commit, merge, or push yet. Feature implementation remains unpushed pending coherent review/integration. Genuine human Git contribution evidence is not available.
+- **Limits/next:** Browser visually inspected at available 890×921 only. Exact 390/768/1440 screenshots, full keyboard/contrast audit, fresh remote clone check, SMTP receipt, background scheduler, evaluator portal submission/access and video submission are unverified. Next: complete responsive review if available, inspect final diff, make transparent local commits, merge/push to `dev` only while the verified remote state and 17:00 cutoff still allow; record external submission status only from the authorized submitter.
+
+## 2026-10-31 11:24 IST — Lifecycle edge checks and final suite refresh
+
+- **Changed:** Added lifecycle tests for expired quote rejection, pause settling the current period, resume before/after the pause boundary, re-anchoring, early-close renewal start, and idempotent renewal. Added optional on-disk SQLite test database support so thread-based concurrency checks can run outside SQLite's in-memory shared-cache limitation. Increased the current admin logout and menu touch target to 44px and added the internal customer detail route used by the scale benchmark.
+- **Checks:** Latest full suite discovered 95 tests and passed with the three on-disk concurrency cases skipped in in-memory mode. Dedicated on-disk concurrency command had already passed all three. `manage.py check`, `makemigrations --check --dry-run`, `git diff --check`, and `node --check static/js/app.js` passed.
+- **Limitations:** No 390/768/1440 screenshot; no actual email transport receipt, background scheduler, browser-render timing, or human Git contribution/review evidence. Remote `dev` and default were read before implementation integration; no branch merge/push was performed yet.
+- **Next:** Final diff review; commits and local/remote integration on `dev`, with no default-branch writes; preserve cutoff at 17:00 IST.
+
+## 2026-10-31 11:26 IST — Quote expiry acceptance and final focused checks
+
+- **Changed:** Added a visible editable quotation expiry field to manual draft forms with the specified seven-day initial value. Template-backed quotes continue to use the selected template's validity at issue time. Added a view assertion for both manual default/editable behavior and preserved template expiry behavior.
+- **Checks:** Latest full suite found 96 tests and passed; 3 concurrency tests skipped in in-memory mode. The dedicated on-disk concurrency suite passed 3/3. `manage.py check`, migration drift check, `git diff --check`, and JS syntax passed. Combined subscription/template view check passed 11/11.
+- **Limitations/next:** Exact responsive viewport checks and visual/accessibility review remain incomplete. Final Git commits/merge/push and external submission evidence remain pending.
+
+## 2026-10-31 11:27 IST — Integrated implementation committed locally
+
+- **Branch/commit:** `codex/remaining-core`, commit `0b436d9a9495fe99f43b929224301603935a6687` (`feat: implement Brightloop subscription workflows`). Commit uses the repository-configured author; it is a local automation-assisted integration commit, not a teammate PR/review.
+- **Contents:** 120 application, template, static CSS and test files; no database, virtualenv, generated cache, or credentials.
+- **Verification before commit:** Full test suite (96 discovered, pass, 3 concurrency skips in in-memory mode); separate on-disk concurrency suite (3 pass); Django check; no-migration check; `git diff --check`; JS syntax.
+- **Git state:** Remote `dev` had just been fetched and exactly matched local `dev` at `4ac7968`; default branch remains separate. Commit is not pushed or merged yet. Documentation evidence remains modified for its own commit.
+- **Next:** Commit the documentation update, re-fetch `dev`, fast-forward local `dev` only if it still matches the verified base, then push the authorized task branch and `dev` if authentication is available and cutoff allows.
+
 ## Entry template
 
 Copy this for actual progress; replace all placeholders and remove irrelevant lines:

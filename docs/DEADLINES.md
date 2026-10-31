@@ -4,16 +4,16 @@ These deadlines were supplied by the participant and supersede the earlier relat
 
 | Deadline | Required action | Responsible person | Current status / evidence |
 | --- | --- | --- | --- |
-| 09:00 | Enter the GitHub repository URL in portal “Submit solution” | Akilan provisionally as team leader; confirm who can submit in the portal | Public repository is live at https://github.com/akilcodes-7/Odoo-Makeathon/tree/dev. Portal entry/receipt remains unverified. |
+| 09:00 | Enter the GitHub repository URL in portal “Submit solution” | Akilan provisionally as team leader; confirm who can submit in the portal | Public repository exists at https://github.com/akilcodes-7/Odoo-Makeathon; portal entry/receipt remains unverified. |
 | 10:00 | Give evaluator Harshil Patel repository collaborator access after the first push | Repository owner | Requested handles: `hapt-odoo` and `hackathon-odoo`. Invitations/access remain unverified; the deadline has passed. The repository is public. |
 | 17:00 | Stop coding | Everyone | Pending. Finish code, relevant fixes, merges, and final code push before cutoff. Record exact final commit. |
 | 17:30 | Submit the video link | Akilan with participant's help; verify submitter in portal | Pending. Upload and check playback/access before submitting. |
 
 ## Immediate priority
 
-At 10:54 IST, both the 09:00 repository-link and 10:00 evaluator-access deadlines have passed. The repository URL is live and the `dev` branch includes the S0 project; the portal submission receipt and collaborator invitations are still unverified. Ask Akilan/the portal to confirm the saved submission and check whether the organizer accepts late evaluator invitations. Do not fabricate a receipt or backdate an invitation.
+At 10:54 IST, both the 09:00 repository-link and 10:00 evaluator-access deadlines had passed. The repository URL is public, but the portal submission receipt and collaborator invitations remain unverified. Read-only remote inspection during integration confirmed `dev` at `4ac796839434cf0570aa0ed451fc86c635acda74`; local code commit `0b436d9` is on `codex/remaining-core` and has not been pushed. Ask Akilan/the portal to confirm the saved submission and check whether the organizer accepts late evaluator invitations. Do not fabricate a receipt or backdate an invitation.
 
-The verified public repository is https://github.com/akilcodes-7/Odoo-Makeathon. Its `dev` branch contains the plan and S0 source. The existing remote default branch was not modified; the local `main` branch remains unchanged.
+The verified public repository is https://github.com/akilcodes-7/Odoo-Makeathon. Its `dev` branch last read as `4ac7968`; the remote default branch is `plan-submission-17140653490169652980` and was not modified. The local `main` branch remains unchanged.
 
 The owner should follow the participant's two-handle instruction unless the portal says otherwise, and record the actual permission level required by the organizer. Do not treat “only the leader can edit the problem statement” as proof that only the leader can submit; verify the submission control itself. Distinguish collaborator invitation sent from invitation accepted/access active. Record both when available.
 
@@ -43,7 +43,7 @@ Recording length/platform are not specified by the supplied rules. Check the por
 | `hapt-odoo` invitation/access status and time | Pending |
 | `hackathon-odoo` invitation/access status and time | Pending |
 | Required collaborator permission level | Pending portal instruction |
-| Final code commit and push time | `c914e43` pushed to `dev` at 10:53 IST; remote verification passed. |
+| Last verified published baseline | `4ac7968` on `dev` (remote read verified during integration); local feature commit `0b436d9` is not yet merged/pushed. |
 | Video URL and playback/access check | Pending |
 | Video submission time and receipt | Pending |
 

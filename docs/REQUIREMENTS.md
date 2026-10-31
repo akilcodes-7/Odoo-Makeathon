@@ -8,13 +8,13 @@ The PDF supplies product requirements. The website rules below were pasted by th
 
 ## Website must-have requirements
 
-| ID | Requirement | Planned mechanism | Evidence required | Status |
-| --- | --- | --- | --- | --- |
-| W1 | Real-time or dynamic data; avoid static JSON beyond prototyping | Database-backed HTML views, mutation forms, and dashboard API; edits survive restart | Create/edit record, reload, restart; show updated UI | Planned |
-| W2 | Responsive clean UI, consistent color/layout | Shared tokens/components and mobile navigation; locally served assets | Screenshots at 390 px, 768 px, and 1440 px | Planned |
-| W3 | Robust input validation | Forms plus service checks plus DB constraints; object permissions | Positive and negative cases in focused tests | Planned |
-| W4 | Intuitive navigation and proper spacing | Role-aware sidebar, page headings, breadcrumbs, visible primary action | Complete demo without navigation dead ends | Planned |
-| W5 | Proper Git use by more than one member | Separate identities, branches, small commits, PR review | Real contribution history and PR URLs | Planned |
+| ID | Requirement | Mechanism | Status and evidence |
+| --- | --- | --- | --- |
+| W1 | Real-time or dynamic data; avoid static JSON beyond prototyping | Database-backed HTML views, mutation forms, and dashboard API | Implemented; auth/catalog/payment persistence tests and 5,000-row DB fixture pass. Restart test exists for catalog pricing. See integration suite. |
+| W2 | Responsive clean UI, consistent color/layout | Shared tokens/components and mobile navigation; locally served assets | Responsive CSS/drawer and reduced-motion support implemented; only 890×921 browser view inspected. 390/768/1440 screenshots remain pending. |
+| W3 | Robust input validation | Forms, services, DB constraints and object permissions | Implemented and tested across auth, catalog, lifecycle, billing, payment, delivery and portal suites. |
+| W4 | Intuitive navigation and proper spacing | Role-aware sidebar, headings, visible actions | Implemented; browser navigation and local dashboard rendered. Full demo rehearsal remains pending. |
+| W5 | Proper Git use by more than one member | Separate identities, branches, small commits, PR review | Incomplete: integrated code commit `0b436d9` is on local `codex/remaining-core` using the configured repo author. No PR/review or separate human teammate commits are recorded yet. |
 
 Dynamic data does not mandate WebSockets. Do not add a simulated live indicator or fabricated changing figures.
 
@@ -29,26 +29,26 @@ Dynamic data does not mandate WebSockets. Do not add a simulated live indicator 
 
 ## Product scope from the PDF and participant clarifications
 
-| ID | Requirement | Owner/cards | Acceptance evidence | Status |
-| --- | --- | --- | --- | --- |
-| P1 | Unique email, 9+ character upper/lower/special password, email reset | Lead S1 | Duplicate-email case variants rejected; reset token works; delivery mode disclosed | Planned |
-| P2 | Admin/staff/customer roles; admin-only staff creation | Lead S1 | Direct endpoint and foreign-record permission checks | Planned |
-| P3 | Customers linked to login accounts; staff customer management | Lead S1/S3 | Signup creates profile; internal customers can exist without login | Planned |
-| P4 | Product name/type/sales price/cost/notes; variant surcharge | Lead S2 | Variant adds 560.00 in example without changing base product | Planned |
-| P5 | Plan price, daily/weekly/monthly/yearly period, minimum quantity, dates, flags | Lead S2/S3 | Form validation and lifecycle actions honor flags | Planned |
-| P6 | Quotation templates with plan/lines/validity days | Teammate 1 T1B | Template copies records; expired quote cannot confirm | Planned |
-| P7 | Numbered subscription, customer/plan/dates/terms/lines/taxes/amounts | Lead S3 | Complete saved subscription and line totals | Planned |
-| P8 | Draft → Quotation → Confirmed → Active → Closed | Lead S3 | Allowed transitions work; skipped/reversed transitions rejected | Planned |
-| P9 | Automatic recurring invoices with taxes; no duplicates or missed periods | Lead S4 | Repeat/catch-up/concurrent-run checks; scheduler command configured | Planned |
-| P10 | Invoice confirm/cancel/send/print; Draft → Confirmed → Paid | Lead S4 + teammate 2 T2B | Snapshot print/email; cancellation and payment rules | Planned |
-| P11 | Admin-only fixed/% discounts; minimums, dates, limits, product/subscription scope | Teammate 1 T1A | Boundary/usage/eligibility checks and invoice snapshot | Planned |
-| P12 | Payments: method/amount/date/note, invoice allocation, outstanding/overdue | Teammate 2 T2A | Partial/full payment, no overpayment or duplicate submission | Planned |
-| P13 | Active subscriptions, revenue, payments, overdue, filters and summary | Teammate 3 T3A | Known seeded totals and filter reconciliation | Planned |
-| P14 | Thousands of subscriptions, pages under 2 seconds | Lead S5/I1 + teammate 3 | Recorded 5,000-record measurements and environment | Planned |
-| P15 | Customer portal; own subscriptions/invoices and permitted close/renew | Teammate 3 T3B + lead S3 | Own-record success, foreign-record 404, flags honored | Planned |
-| U1 | MRR normalized across all four periods | Teammate 3 T3A | Defined formula, seeded known values | Planned |
-| U2 | Attractive UI with restrained animation | Lead S0/I1; all owners use components | Responsive and reduced-motion review | Planned |
-| U3 | Full hackathon documentation | Every contributor | Honest logs, handoff, decisions, check evidence, demo instructions | In progress |
+| ID | Requirement | Owner/cards | Status and evidence |
+| --- | --- | --- | --- |
+| P1 | Unique email, 9+ character upper/lower/special password, email reset | Lead S1 | Implemented; `tests.test_auth` (7) covers case-insensitive uniqueness, exact password rule, one-use reset token and POST/CSRF logout. Email backend defaults to console. |
+| P2 | Admin/staff/customer roles; admin-only staff creation | Lead S1 | Implemented; team/customer/payment/template/portal access checks cover role-gated endpoints. |
+| P3 | Customers linked to login accounts; staff customer management | Lead S1/S3 | Implemented; signup creates the customer atomically; internal creation remains unlinked; own profile form is scoped. |
+| P4 | Product name/type/sales price/cost/notes; variant surcharge | Lead S2 | Implemented; `tests.test_catalog` (10) covers paise conversion, variant validity/effective price and archive. The separate ₹560 example was not captured. |
+| P5 | Plan price, daily/weekly/monthly/yearly period, minimum quantity, dates, flags | Lead S2/S3 | Implemented; catalog/lifecycle/portal tests cover eligibility, minimum and action flags. |
+| P6 | Quotation templates with plan/lines/validity days | Teammate 1 T1B | Implemented; `tests.test_templates` (6) covers admin create, staff use, plan/primary validation, copied price independence, validity and access. |
+| P7 | Numbered subscription, customer/plan/dates/terms/lines/taxes/amounts | Lead S3 | Implemented; `tests.test_subscription_views` and billing snapshots cover persisted drafts, validation and line/tax snapshots. |
+| P8 | Draft → Quotation → Confirmed → Active → Closed | Lead S3 | Implemented through `core.services.lifecycle`; tests cover normal path, invalid skips, expired quote, pause/resume/close/renew edges and events. |
+| P9 | Automatic recurring invoices with taxes; no duplicates or missed periods | Lead S4 | Billing command and POST action implemented; repeat, catch-up, rollback, proration and concurrent duplicate tests pass. No OS/background scheduler is configured. |
+| P10 | Invoice confirm/cancel/send/print; Draft → Confirmed → Paid | Lead S4 + teammate 2 T2B | Implemented; snapshot send/print and mail-failure tests pass. Delivery uses console email by default; no external delivery receipt verified. |
+| P11 | Admin-only fixed/% discounts; minimums, dates, limits, product/subscription scope | Teammate 1 T1A | Implemented; 12 discount tests plus competing-invoice max-usage concurrency test pass. |
+| P12 | Payments: method/amount/date/note, invoice allocation, outstanding/overdue | Teammate 2 T2A | Implemented; partial/full, replay, validation, overdue and distinct concurrent overpay tests pass. No gateway integration. |
+| P13 | Active subscriptions, revenue, payments, overdue, filters and summary | Teammate 3 T3A | Implemented; 4 reporting tests and 5,000-row backend measurements pass. |
+| P14 | Thousands of subscriptions, pages under 2 seconds | Lead S5/I1 + teammate 3 | Backend checks passed on 5,000 subscriptions + 5,000 invoices/lines + 2,500 payments; exact environment/timings in `DEMO_AND_CHECKS.md`. Browser rendering and concurrent-load timings remain unmeasured. |
+| P15 | Customer portal; own subscriptions/invoices and permitted close/renew | Teammate 3 T3B + lead S3 | Implemented; 9 portal tests cover scoped IDs, allowed/blocked actions, invoices, print and profile route. |
+| U1 | MRR normalized across all four periods | Teammate 3 T3A | Implemented using Decimal normalization and integer paise; hand-calculated/empty/customer-scope reporting tests pass. |
+| U2 | Attractive UI with restrained animation | Lead S0/I1; all owners use components | Core UI and reduced motion implemented; 890×921 browser view inspected. Exact 390/768/1440 and contrast/a11y review remains pending. |
+| U3 | Full hackathon documentation | Every contributor | In progress; actual test/benchmark evidence updated. Final commits/push/PR evidence, screenshots and portal/video records are pending. |
 
 U1–U3 are explicit participant additions. The PDF asks for revenue but does not define an MRR formula. Taxes, pause/renew behavior, discount stacking, partial terms, currency, and report definitions follow the documented project assumptions.
 
