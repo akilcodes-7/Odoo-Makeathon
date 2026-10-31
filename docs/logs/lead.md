@@ -11,5 +11,13 @@ Role: solo morning spine; afternoon reviews/integration/shared code. Branch targ
 - **Pending:** exact mobile-width browser visual check. S1 and feature cards remain unstarted. No test or demo DB committed; no remote/commit.
 - **Next:** Stop after this requested card. Await an explicit request before S1.
 
+## 2026-10-31 10:53 IST — S0 code published on `dev`
+
+- **Work:** Joined the plan-only branch with the existing S0 project history, preserving both parents; pushed merge commit `c914e43` to the requested GitHub `dev` branch.
+- **Files:** Complete S0 tree (98 files), including application modules, migrations, templates, local CSS/JS, requirements and project documentation. The evaluator plan remains the root README; detailed specification and handoff materials are under `docs/`.
+- **Verification:** Remote `dev` points to `c914e43`; its tree contains the project files. The preexisting remote default branch and local `main` were not changed.
+- **Limitations:** No feature implementation beyond S0; portal submission and evaluator invitations remain unverified.
+- **Next:** Teammates use `dev` as the shared base; resume only the task assigned by the participant.
+
 Entry format: IST timestamp; card; what changed/why; files; checks/results; commit/PR; blocker; next owner/action.
 

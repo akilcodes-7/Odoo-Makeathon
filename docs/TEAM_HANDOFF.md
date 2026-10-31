@@ -1,10 +1,10 @@
 # Current handoff — read this first at 1 pm
 
-**Last recorded update:** 2026-10-31 09:53 IST. This update records S0 implementation/checkpoint results; it does not mean the later hackathon cards are complete.
+**Last recorded update:** 2026-10-31 10:54 IST. S0 source and plan are pushed to the public `dev` branch; later feature cards remain incomplete.
 
 ## Deadline actions first
 
-[Hard deadline tracker](DEADLINES.md): 09:00 repo-link submission; 10:00 evaluator access; 17:00 coding ends; 17:30 video submission. The 09:00 time has passed; portal submission status is unknown. Verify with Akilan/the portal immediately. Repository owner handles the two requested evaluator handles before 10:00. Akilan is the provisional portal submitter; verify actual permissions.
+[Hard deadline tracker](DEADLINES.md): the 09:00 repository link and 10:00 evaluator access deadlines have passed. Repository URL is live; portal receipt and `hapt-odoo`/`hackathon-odoo` collaborator invitations remain unverified. Akilan is the provisional portal submitter; verify actual permissions.
 
 ## Actual state
 
@@ -14,7 +14,7 @@
 - `/tmp` was used for test databases. No test DB is committed; the project root default `db.sqlite3` remains unseeded.
 - `core/migrations/0001_initial.py` plus `0002_...` contain shared schema constraints; accounts uses `0001_initial.py`.
 - `requirements.txt` pins Django 5.2.18. `.venv/` and `.venv-verify/` are local ignored environments, Python 3.12.14.
-- No GitHub repository URL or pushed base commit has been supplied/verified in this chat. This workspace has no `.git` directory.
+- Public GitHub repository: https://github.com/akilcodes-7/Odoo-Makeathon. Branch `dev` contains plan plus S0 project files at `c914e43`; existing remote default branch was not modified. The local `main` branch is unchanged.
 - A desktop browser screenshot was inspected but not saved as an evidence file. No 5,000-record benchmark is run.
 - Teammates are unavailable for implementation before 13:00 IST. Portal administration deadlines still require the responsible submitter/owner to act earlier; do not defer those to the coding handoff.
 
@@ -32,8 +32,8 @@
 
 | Item | Actual value |
 | --- | --- |
-| GitHub repository | Not provided |
-| Shared base commit | Not created/verified; this workspace has no Git repository |
+| GitHub repository | https://github.com/akilcodes-7/Odoo-Makeathon; branch `dev` |
+| Shared base commit | `c914e43` on `dev` (pushed and verified at 10:53 IST) |
 | Python/Django exact versions | Python 3.12.14, Django 5.2.18 |
 | Fresh setup commands | README updated and venv install from requirements verified |
 | Demo credentials | Seed command prompts securely; shared local password not stored |
@@ -52,7 +52,7 @@
 - [ ] Commit the shared discount dataclasses and stub signature.
 - [ ] Commit invoice state helper and balance/payment contract.
 - [ ] Record lifecycle helpers the portal must call.
-- [ ] Push base commit; every teammate branches from it using their own identity.
+- [x] Push shared S0 base on `dev`; every teammate branches from `c914e43` using their own identity.
 - [ ] Verify clone/run instructions on a fresh checkout.
 - [ ] Record incomplete morning work with an owner, rather than hiding it.
 
