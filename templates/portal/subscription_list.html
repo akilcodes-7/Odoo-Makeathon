@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}My subscriptions{% endblock %}
+{% block topbar_context %}My subscriptions{% endblock %}
+{% block page_title %}My subscriptions{% endblock %}
+{% block page_description %}<p class="page-description">Your subscription history and current service terms.</p>{% endblock %}
+{% block content %}
+<div class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Reference</th><th>Plan</th><th>Service term</th><th>Status</th><th>Billing</th><th></th></tr></thead><tbody>
+{% for subscription in page_obj %}<tr><td>{{ subscription.number }}</td><td>{{ subscription.plan.name }}</td><td>{{ subscription.start_date }} – {{ subscription.expiry_date }}</td><td>{{ subscription.get_status_display }}{% if subscription.is_paused %}<span class="table-secondary">{% if subscription.pause_effective_on > today %}Pause scheduled {{ subscription.pause_effective_on }}{% else %}Paused{% endif %}</span>{% endif %}</td><td>{{ subscription.get_billing_period_display }}</td><td><a href="{% url 'portal:subscription_detail' subscription.pk %}">Details</a></td></tr>{% empty %}<tr><td colspan="6">You do not have any subscriptions yet.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Subscription pages">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}
+{% endblock %}

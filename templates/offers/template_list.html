@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Quotation templates · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header"><div><p class="eyebrow">Offers</p><h1>Quotation templates</h1><p>Reusable starting points; issued quotations keep independent line prices.</p></div>{% if user.role == "ADMIN" %}<a class="button button--primary" href="{% url 'offers:template_create' %}">New template</a>{% endif %}</div>
+<section class="panel table-wrap"><table><thead><tr><th>Name</th><th>Plan</th><th>Validity</th><th>Lines</th><th>Status</th><th></th></tr></thead><tbody>
+{% for template in page_obj %}<tr><td><a href="{% url 'offers:template_detail' template.pk %}">{{ template.name }}</a></td><td>{{ template.plan.name }}</td><td>{{ template.validity_days }} days</td><td>{{ template.lines.count }}</td><td>{% if template.is_active %}Active{% else %}Archived{% endif %}</td><td><a href="{% url 'offers:template_detail' template.pk %}">View</a></td></tr>
+{% empty %}<tr><td colspan="6" class="empty-state">No quotation templates are configured.</td></tr>{% endfor %}
+</tbody></table></section>
+{% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Pagination">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}
+{% endblock %}

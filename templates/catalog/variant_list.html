@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Variants{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/catalog.css' %}">{% endblock %}
+{% block topbar_context %}Product &amp; plan catalog{% endblock %}
+{% block breadcrumbs %}<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{% url 'catalog:products' %}">Products</a><span aria-hidden="true">/</span><span>Variants</span></nav>{% endblock %}
+{% block page_title %}Variants{% endblock %}
+{% block page_description %}<p class="page-description">Active variants available on active products.</p>{% endblock %}
+{% block content %}
+<form method="get" class="filter-row catalog-search"><div class="form-field"><label class="field-label" for="variant-search">Search variants</label><input id="variant-search" name="q" value="{{ query }}" type="search" placeholder="Product, attribute or value"></div><button class="button button--secondary" type="submit">Search</button></form>
+<section class="table-card" aria-label="Product variants"><div class="table-scroll"><table class="data-table"><thead><tr><th>Product</th><th>Attribute</th><th>Value</th><th class="numeric">Extra price</th><th></th></tr></thead><tbody>{% for variant in page_obj %}<tr><td><a href="{% url 'catalog:product_detail' variant.product_id %}">{{ variant.product.name }}</a></td><td>{{ variant.attribute_name }}</td><td>{{ variant.attribute_value }}</td><td class="numeric">{{ variant.extra_price_display }}</td><td>{% if user.role == 'ADMIN' %}<a href="{% url 'catalog:variant_edit' variant.pk %}">Edit</a>{% endif %}</td></tr>{% empty %}<tr><td colspan="5"><div class="empty-state"><h2>No variants found</h2><p>Add variants from an active product's detail page.</p></div></td></tr>{% endfor %}</tbody></table></div>{% include 'components/table_pagination.html' with page_obj=page_obj %}</section>
+{% endblock %}

@@ -65,7 +65,7 @@
       </nav>
       <div class="sidebar-footer">
         <span class="system-dot" aria-hidden="true"></span>
-        <span>S0 preview</span>
+            <span>Operations</span>
       </div>
     </aside>
 
@@ -80,6 +80,7 @@
             <span class="role-chip">{{ user.get_role_display|default:user.role }}</span>
             <span class="user-avatar" aria-hidden="true">{{ user.first_name|default:user.email|first|upper }}</span>
             <span class="user-name">{{ user.get_full_name|default:user.email }}</span>
+            <form method="post" action="{% url 'accounts:logout' %}" class="logout-form">{% csrf_token %}<button class="button button--secondary" type="submit">Sign out</button></form>
           {% endif %}
         </div>
       </header>

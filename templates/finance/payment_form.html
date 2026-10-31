@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% load finance_tags %}
+
+{% block title %}Record payment · {{ invoice.number }}{% endblock %}
+{% block page_title %}Record payment{% endblock %}
+{% block page_description %}<p>{{ invoice.number }} · Outstanding balance {{ balance_paise|paise }}. Payment is saved in paise and checked against the current balance on submit.</p>{% endblock %}
+{% block content %}
+  <section class="panel form-panel">
+    {% if invoice.status != "CONFIRMED" %}<p role="status">Payments can be recorded only for confirmed invoices. This invoice is {{ invoice.get_status_display|lower }}.</p>{% endif %}
+    <form method="post" novalidate>{% csrf_token %}{{ form.idempotency_key }}
+      {% if form.non_field_errors %}<div class="field-error" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form.visible_fields %}<div class="form-field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<p class="field-error" role="alert">{{ error }}</p>{% endfor %}</div>{% endfor %}
+      <div class="form-actions"><a class="button button-secondary" href="{% url 'finance_payments:list' %}">Cancel</a><button class="button button-primary" type="submit"{% if invoice.status != "CONFIRMED" or balance_paise <= 0 %} disabled{% endif %}>Record payment</button></div>
+    </form>
+  </section>
+{% endblock %}

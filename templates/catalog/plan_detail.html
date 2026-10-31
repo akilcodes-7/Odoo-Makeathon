@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ plan.name }}{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/catalog.css' %}">{% endblock %}
+{% block breadcrumbs %}<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{% url 'catalog:plans' %}">Plans</a><span aria-hidden="true">/</span><span>{{ plan.name }}</span></nav>{% endblock %}
+{% block page_title %}{{ plan.name }}{% endblock %}
+{% block page_description %}<p class="page-description">{{ plan.get_period_display }} plan for {{ plan.primary_product.name }}</p>{% endblock %}
+{% block page_actions %}{% if user.role == 'ADMIN' %}<a class="button button--secondary" href="{% url 'catalog:plan_edit' plan.pk %}">Edit</a>{% if plan.is_active %}<form method="post" action="{% url 'catalog:plan_archive' plan.pk %}">{% csrf_token %}<button class="button button--danger" type="submit">Archive</button></form>{% endif %}{% endif %}{% endblock %}
+{% block content %}<section class="card"><dl class="catalog-details"><dt>Primary product</dt><dd><a href="{% url 'catalog:product_detail' plan.primary_product_id %}">{{ plan.primary_product.name }}</a></dd><dt>Recurring unit price</dt><dd>{{ plan.price_display }}</dd><dt>Frequency</dt><dd>{{ plan.get_period_display }}</dd><dt>Minimum quantity</dt><dd>{{ plan.min_quantity }}</dd><dt>Available from</dt><dd>{{ plan.available_from }}</dd><dt>Available until</dt><dd>{{ plan.available_until|default:'No end date' }}</dd><dt>Options</dt><dd>{% if plan.auto_close %}Auto close · {% endif %}{% if plan.closable %}Closable · {% endif %}{% if plan.pausable %}Pausable · {% endif %}{% if plan.renewable %}Renewable{% endif %}</dd><dt>Status</dt><dd>{% if plan.is_active %}Active{% else %}Archived{% endif %}</dd></dl></section>{% endblock %}

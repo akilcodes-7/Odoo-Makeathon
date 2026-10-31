@@ -80,6 +80,7 @@ DATABASES = {
             "transaction_mode": "IMMEDIATE",
             "timeout": 20,
         },
+        "TEST": {"NAME": os.environ.get("TEST_DATABASE_PATH")},
     }
 }
 
@@ -106,6 +107,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 EMAIL_BACKEND = os.environ.get(
     "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
 )
+EMAIL_FILE_PATH = os.environ.get("EMAIL_FILE_PATH", "/tmp/brightloop-emails")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "subscriptions@localhost")
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
 EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "25"))

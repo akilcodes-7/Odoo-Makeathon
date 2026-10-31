@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% load finance_tags %}
+
+{% block title %}Payments{% endblock %}
+{% block page_title %}Payments{% endblock %}
+{% block page_description %}<p>Recorded payment history. Balances are calculated from saved payment records.</p>{% endblock %}
+{% block content %}
+  <section class="panel" aria-label="Payment history">
+    {% if payments.object_list %}
+      <div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Date</th><th>Method</th><th>Amount</th><th>Recorded by</th></tr></thead><tbody>
+      {% for payment in payments %}<tr><td>{{ payment.invoice.number }}</td><td>{{ payment.paid_on }}</td><td>{{ payment.get_method_display }}</td><td>{{ payment.amount_paise|paise }}</td><td>{{ payment.created_by|default:"System" }}</td></tr>{% endfor %}
+      </tbody></table></div>
+      {% if payments.has_other_pages %}<nav aria-label="Payment pages" class="pagination">{% if payments.has_previous %}<a href="?page={{ payments.previous_page_number }}">Previous</a>{% endif %}<span>Page {{ payments.number }} of {{ payments.paginator.num_pages }}</span>{% if payments.has_next %}<a href="?page={{ payments.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}
+    {% else %}<div class="empty-state"><h2>No payments recorded</h2><p>Payments will appear here after a confirmed invoice receives one.</p></div>{% endif %}
+  </section>
+{% endblock %}
