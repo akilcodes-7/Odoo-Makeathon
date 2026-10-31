@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block topbar_context %}Customer records{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_description %}<p class="page-description">{% if own_profile %}Update the contact details used for your account.{% else %}The customer record is not linked to a login unless the verified account-linking flow is used.{% endif %}</p>{% endblock %}
+{% block content %}
+<section class="form-card"><form method="post" novalidate>{% csrf_token %}{% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+{% for field in form %}{% include 'components/field.html' with field=field %}{% endfor %}
+<div class="form-actions"><button class="button button--primary" type="submit">Save customer</button>{% if own_profile %}<a class="button button--secondary" href="{% url 'portal:dashboard' %}">Cancel</a>{% else %}<a class="button button--secondary" href="{% url 'customers:list' %}">Cancel</a>{% endif %}</div></form></section>
+{% endblock %}

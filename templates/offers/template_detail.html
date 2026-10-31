@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load money %}
+{% block title %}{{ template.name }} · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header"><div><p class="eyebrow">Quotation template</p><h1>{{ template.name }}</h1><p>{{ template.plan.name }} · valid for {{ template.validity_days }} days · {% if template.is_active %}active{% else %}archived{% endif %}</p></div><div class="button-row"><a class="button button--secondary" href="{% url 'offers:template_list' %}">All templates</a>{% if user.role == "ADMIN" %}<a class="button button--primary" href="{% url 'offers:template_edit' template.pk %}">Edit</a>{% endif %}</div></div>
+{% if template.notes %}<section class="panel"><h2>Notes</h2><p>{{ template.notes|linebreaksbr }}</p></section>{% endif %}
+<section class="panel table-wrap"><table><thead><tr><th>Product</th><th>Variant</th><th>Role</th><th>Quantity</th><th>Unit price</th><th>Taxes</th></tr></thead><tbody>{% for line in template.lines.all %}<tr><td>{{ line.product.name }}</td><td>{{ line.variant|default:"—" }}</td><td>{% if line.is_primary %}Primary{% else %}Additional{% endif %}</td><td>{{ line.quantity }}</td><td>{{ line.unit_price_paise|money }}</td><td>{% for tax in line.taxes.all %}{{ tax.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td></tr>{% empty %}<tr><td colspan="6" class="empty-state">No template lines are configured.</td></tr>{% endfor %}</tbody></table></section>
+{% endblock %}

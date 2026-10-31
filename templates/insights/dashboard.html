@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load finance_tags %}
+{% load static %}
+
+{% block title %}Overview{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/insights.css' %}">{% endblock %}
+{% block topbar_context %}Business overview{% endblock %}
+{% block page_title %}Overview{% endblock %}
+{% block page_description %}<p class="page-subtitle">A current view of subscriptions and receivables, with collections for your selected date range.</p>{% endblock %}
+{% block content %}
+  {% if error %}<div class="report-error" role="alert">{{ error }}</div>{% endif %}
+  <form class="report-filters" method="get" aria-label="Dashboard filters">
+    <div class="filter-field"><label for="filter-start">Payment date from</label><input id="filter-start" type="date" name="start" value="{{ filters.start_date|date:'Y-m-d' }}"></div>
+    <div class="filter-field"><label for="filter-end">Payment date to</label><input id="filter-end" type="date" name="end" value="{{ filters.end_date|date:'Y-m-d' }}"></div>
+    {% if user.role != 'CUSTOMER' %}<div class="filter-field"><label for="filter-customer">Customer</label><select id="filter-customer" name="customer"><option value="">All customers</option>{% for customer in customers %}<option value="{{ customer.pk }}"{% if filters.customer_id == customer.pk %} selected{% endif %}>{{ customer.display_name }}</option>{% endfor %}</select></div>{% endif %}
+    <div class="filter-field"><label for="filter-sub-status">Subscription status</label><select id="filter-sub-status" name="subscription_status"><option value="">All statuses</option>{% for value,label in subscription_statuses %}<option value="{{ value }}"{% if filters.subscription_status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="filter-field"><label for="filter-inv-status">Invoice status</label><select id="filter-inv-status" name="invoice_status"><option value="">All statuses</option>{% for value,label in invoice_statuses %}<option value="{{ value }}"{% if filters.invoice_status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+    <div class="filter-field"><label for="filter-sub-sort">Subscription order</label><select id="filter-sub-sort" name="subscription_sort"><option value="newest"{% if filters.subscription_sort == 'newest' %} selected{% endif %}>Newest</option><option value="oldest"{% if filters.subscription_sort == 'oldest' %} selected{% endif %}>Oldest</option><option value="customer"{% if filters.subscription_sort == 'customer' %} selected{% endif %}>Customer</option><option value="expiry"{% if filters.subscription_sort == 'expiry' %} selected{% endif %}>Expiry date</option></select></div>
+    <div class="filter-field"><label for="filter-invoice-sort">Invoice order</label><select id="filter-invoice-sort" name="invoice_sort"><option value="newest"{% if filters.invoice_sort == 'newest' %} selected{% endif %}>Newest</option><option value="oldest"{% if filters.invoice_sort == 'oldest' %} selected{% endif %}>Oldest</option><option value="due"{% if filters.invoice_sort == 'due' %} selected{% endif %}>Due date</option><option value="amount"{% if filters.invoice_sort == 'amount' %} selected{% endif %}>Highest amount</option></select></div>
+    <div class="filter-field filter-search"><label for="filter-search">Search</label><input id="filter-search" type="search" name="q" value="{{ filters.search }}" placeholder="Number, customer, or plan"></div>
+    <div class="filter-actions"><button class="button button--primary" type="submit">Apply filters</button><a class="button button--secondary" href="{% url 'insights:dashboard' %}">Clear</a></div>
+  </form>
+
+  {% if summary %}
+  <p class="range-caption">Snapshot as of {{ today|date:"M j, Y" }} <span>·</span> Collections and invoiced value from {{ filters.start_date|date:"M j, Y" }} to {{ filters.end_date|date:"M j, Y" }}</p>
+  <section class="metric-grid report-metrics" aria-label="Dashboard summary">
+    <article class="metric-card"><span class="metric-label">Active subscriptions <span class="help" title="Current snapshot: active, within contract dates, and not yet paused.">ⓘ</span></span><strong class="metric-value">{{ summary.active_subscriptions }}</strong><span class="metric-note">Current snapshot · selected customer</span></article>
+    <article class="metric-card"><span class="metric-label">MRR before discounts <span class="help" title="Recurring pre-tax line values normalized to a month. Temporary discounts and terminal proration are excluded.">ⓘ</span></span><strong class="metric-value">{{ summary.mrr_before_discounts_paise|paise }}</strong><span class="metric-note">Estimated monthly recurring value</span></article>
+    <article class="metric-card"><span class="metric-label">Outstanding</span><strong class="metric-value">{{ summary.outstanding_paise|paise }}</strong><span class="metric-note">{{ summary.outstanding_invoice_count }} confirmed invoices · all due dates</span></article>
+    <article class="metric-card"><span class="metric-label">Overdue</span><strong class="metric-value">{{ summary.overdue_paise|paise }}</strong><span class="metric-note">{{ summary.overdue_invoice_count }} invoices due before today</span></article>
+    <article class="metric-card"><span class="metric-label">Revenue collected</span><strong class="metric-value">{{ summary.collected_paise|paise }}</strong><span class="metric-note">Cash basis · selected payment date range</span></article>
+    <article class="metric-card"><span class="metric-label">Invoiced value</span><strong class="metric-value">{{ summary.invoiced_paise|paise }}</strong><span class="metric-note">Confirmed and paid invoices issued in range</span></article>
+  </section>
+
+  <section class="report-panel" aria-labelledby="collections-title">
+    <div class="report-panel-heading"><div><h2 id="collections-title">Collections by day</h2><p>Daily payments in the selected range, cash basis. Table is limited to the first 31 dates.</p></div></div>
+    {% if collection_days %}<div class="table-scroll"><table><caption class="visually-hidden">Daily collected amount and payment count</caption><thead><tr><th scope="col">Paid on</th><th scope="col">Payments</th><th scope="col" class="number-cell">Collected</th></tr></thead><tbody>{% for day in collection_days %}<tr><td>{{ day.paid_on|date:"M j, Y" }}</td><td>{{ day.payments }}</td><td class="number-cell">{{ day.amount_paise|paise }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<p class="report-empty">No payments were recorded in this date range.</p>{% endif %}
+  </section>
+
+  <section class="report-panel" aria-labelledby="overdue-title">
+    <div class="report-panel-heading"><div><h2 id="overdue-title">Overdue invoices</h2><p>Confirmed invoices with a remaining balance and a due date before {{ today|date:"M j, Y" }}.</p></div></div>
+    {% if overdue_page %}<div class="table-scroll"><table><caption class="visually-hidden">Overdue invoices with outstanding balances</caption><thead><tr><th scope="col">Invoice</th><th scope="col">Customer</th><th scope="col">Due date</th><th scope="col" class="number-cell">Balance</th></tr></thead><tbody>{% for invoice in overdue_page %}<tr><td>{% if user.role == 'CUSTOMER' %}{{ invoice.number }}{% else %}<a href="{% url 'finance:invoice_detail' invoice.pk %}">{{ invoice.number }}</a>{% endif %}</td><td>{{ invoice.customer_name }}</td><td>{{ invoice.due_date|date:"M j, Y" }}</td><td class="number-cell">{{ invoice.balance_paise|paise }}</td></tr>{% empty %}<tr><td colspan="4" class="empty-row">No overdue balances.</td></tr>{% endfor %}</tbody></table></div>{% if overdue_page.has_other_pages %}<nav class="report-pagination" aria-label="Overdue invoice pages">{% if overdue_page.has_previous %}<a href="?{{ query_string }}&overdue_page={{ overdue_page.previous_page_number }}#overdue-title">Previous page</a>{% endif %}<span>Page {{ overdue_page.number }} of {{ overdue_page.paginator.num_pages }}</span>{% if overdue_page.has_next %}<a href="?{{ query_string }}&overdue_page={{ overdue_page.next_page_number }}#overdue-title">Next page</a>{% endif %}</nav>{% endif %}{% endif %}
+  </section>
+
+  <section class="report-panel" aria-labelledby="subscriptions-title">
+    <div class="report-panel-heading"><div><h2 id="subscriptions-title">Subscriptions</h2><p>Filtered records · up to 25 per page.</p></div></div>
+    <div class="table-scroll"><table><caption class="visually-hidden">Subscriptions matching current filters</caption><thead><tr><th scope="col">Number</th><th scope="col">Customer</th><th scope="col">Plan</th><th scope="col">Status</th><th scope="col">Expires</th></tr></thead><tbody>{% for subscription in subscriptions_page %}<tr><td>{% if user.role == 'CUSTOMER' %}{{ subscription.number }}{% else %}<a href="{% url 'subscriptions:detail' subscription.pk %}">{{ subscription.number }}</a>{% endif %}</td><td>{{ subscription.customer.display_name }}</td><td>{{ subscription.plan.name }}</td><td>{{ subscription.get_status_display }}{% if subscription.is_paused %} (paused){% endif %}</td><td>{{ subscription.expiry_date|date:"M j, Y" }}</td></tr>{% empty %}<tr><td colspan="5" class="empty-row">No subscriptions match these filters.</td></tr>{% endfor %}</tbody></table></div>
+    {% if subscriptions_page.has_other_pages %}<nav class="report-pagination" aria-label="Subscription pages">{% if subscriptions_page.has_previous %}<a href="?{{ query_string }}&page={{ subscriptions_page.previous_page_number }}#subscriptions-title">Previous page</a>{% endif %}<span>Page {{ subscriptions_page.number }} of {{ subscriptions_page.paginator.num_pages }}</span>{% if subscriptions_page.has_next %}<a href="?{{ query_string }}&page={{ subscriptions_page.next_page_number }}#subscriptions-title">Next page</a>{% endif %}</nav>{% endif %}
+  </section>
+
+  <section class="report-panel" aria-labelledby="invoices-title">
+    <div class="report-panel-heading"><div><h2 id="invoices-title">Invoices</h2><p>Filtered records · up to 25 per page.</p></div></div>
+    <div class="table-scroll"><table><caption class="visually-hidden">Invoices matching current filters</caption><thead><tr><th scope="col">Invoice</th><th scope="col">Customer</th><th scope="col">Issued</th><th scope="col">Status</th><th scope="col" class="number-cell">Total</th></tr></thead><tbody>{% for invoice in invoices_page %}<tr><td>{% if user.role == 'CUSTOMER' %}{{ invoice.number }}{% else %}<a href="{% url 'finance:invoice_detail' invoice.pk %}">{{ invoice.number }}</a>{% endif %}</td><td>{{ invoice.customer_name }}</td><td>{{ invoice.invoice_date|date:"M j, Y" }}</td><td>{{ invoice.get_status_display }}</td><td class="number-cell">{{ invoice.total_paise|paise }}</td></tr>{% empty %}<tr><td colspan="5" class="empty-row">No invoices match these filters.</td></tr>{% endfor %}</tbody></table></div>
+    {% if invoices_page.has_other_pages %}<nav class="report-pagination" aria-label="Invoice pages">{% if invoices_page.has_previous %}<a href="?{{ query_string }}&page={{ invoices_page.previous_page_number }}#invoices-title">Previous page</a>{% endif %}<span>Page {{ invoices_page.number }} of {{ invoices_page.paginator.num_pages }}</span>{% if invoices_page.has_next %}<a href="?{{ query_string }}&page={{ invoices_page.next_page_number }}#invoices-title">Next page</a>{% endif %}</nav>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}

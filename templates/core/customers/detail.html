@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load money %}
+{% block title %}{{ customer.display_name }} · Customers{% endblock %}
+{% block content %}
+<div class="page-header"><div><p class="eyebrow">Customer</p><h1>{{ customer.display_name }}</h1><p>{{ customer.billing_email }}{% if customer.phone %} · {{ customer.phone }}{% endif %}</p></div><div class="button-row"><a class="button button--secondary" href="{% url 'customers:list' %}">All customers</a><a class="button button--primary" href="{% url 'customers:edit' customer.pk %}">Edit customer</a></div></div>
+<section class="panel"><h2>Billing contact</h2><p>{{ customer.billing_email }}</p><p>{{ customer.billing_address|default:"No billing address on file."|linebreaksbr }}</p><p>Status: {% if customer.is_active %}Active{% else %}Inactive{% endif %}</p></section>
+<section class="panel table-wrap"><h2>Recent subscriptions</h2><table><thead><tr><th>Number</th><th>Plan</th><th>Status</th><th>Dates</th></tr></thead><tbody>{% for subscription in subscriptions %}<tr><td><a href="{% url 'subscriptions:detail' subscription.pk %}">{{ subscription.number }}</a></td><td>{{ subscription.plan.name }}</td><td>{{ subscription.get_status_display }}</td><td>{{ subscription.start_date }} – {{ subscription.expiry_date }}</td></tr>{% empty %}<tr><td colspan="4" class="empty-state">No subscriptions yet.</td></tr>{% endfor %}</tbody></table></section>
+<section class="panel table-wrap"><h2>Recent invoices</h2><table><thead><tr><th>Invoice</th><th>Date</th><th>Status</th><th>Total</th></tr></thead><tbody>{% for invoice in invoices %}<tr><td><a href="{% url 'finance:invoice_detail' invoice.pk %}">{{ invoice.number }}</a></td><td>{{ invoice.invoice_date }}</td><td>{{ invoice.get_status_display }}</td><td>{{ invoice.total_paise|money }}</td></tr>{% empty %}<tr><td colspan="4" class="empty-state">No invoices yet.</td></tr>{% endfor %}</tbody></table></section>
+{% endblock %}

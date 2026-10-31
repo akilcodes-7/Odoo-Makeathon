@@ -1,0 +1,6 @@
+<section class="empty-state" aria-labelledby="{{ empty_title_id|default:'empty-state-title' }}">
+  <div class="empty-state-icon" aria-hidden="true">{{ empty_icon|default:'↗' }}</div>
+  <h2 id="{{ empty_title_id|default:'empty-state-title' }}">{{ empty_title|default:'Nothing here yet' }}</h2>
+  {% if empty_description %}<p>{{ empty_description }}</p>{% endif %}
+  {% if empty_action_url and empty_action_label %}<a class="button button--primary" href="{{ empty_action_url }}">{{ empty_action_label }}</a>{% endif %}
+</section>

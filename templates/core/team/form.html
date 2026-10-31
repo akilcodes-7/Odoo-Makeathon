@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}Add staff member{% endblock %}
+{% block topbar_context %}Team access{% endblock %}
+{% block page_title %}Add staff member{% endblock %}
+{% block page_description %}<p class="page-description">Only admins can create staff accounts. The new account receives the staff role.</p>{% endblock %}
+{% block content %}<section class="form-card"><form method="post" novalidate>{% csrf_token %}{% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}{% for field in form %}{% include 'components/field.html' with field=field %}{% endfor %}<div class="form-actions"><button class="button button--primary" type="submit">Create staff account</button><a class="button button--secondary" href="{% url 'team:list' %}">Cancel</a></div></form></section>{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Discounts{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/offers.css' %}">{% endblock %}
+{% block topbar_context %}Offers &amp; discounts{% endblock %}
+{% block page_title %}Discounts{% endblock %}
+{% block page_description %}<p class="page-description">Create and manage automatic discount rules. Billing applies at most one eligible rule to each invoice.</p>{% endblock %}
+{% block page_actions %}<a class="button button--primary" href="{% url 'offers:discount_create' %}">Add discount</a>{% endblock %}
+{% block content %}
+<form method="get" class="filter-row offers-filter"><div class="form-field"><label class="field-label" for="discount-search">Search discounts</label><input id="discount-search" type="search" name="q" value="{{ query }}" placeholder="Name or product"></div><div class="form-field"><label class="field-label" for="discount-status">Status</label><select id="discount-status" name="status"><option value="">All</option><option value="active"{% if status == 'active' %} selected{% endif %}>Active</option><option value="archived"{% if status == 'archived' %} selected{% endif %}>Archived</option></select></div><button class="button button--secondary" type="submit">Filter</button></form>
+<section class="table-card" aria-label="Discount rules"><div class="table-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Rule</th><th>Scope</th><th>Minimum</th><th>Dates</th><th>Uses</th><th>Status</th></tr></thead><tbody>
+{% for discount in page_obj %}<tr><td><a class="table-primary" href="{% url 'offers:discount_detail' discount.pk %}">{{ discount.name }}</a></td><td>{{ discount.value_display }}</td><td>{{ discount.get_scope_display }}</td><td>{{ discount.minimum_display }}{% if discount.min_quantity %}<br>{{ discount.min_quantity }} units{% endif %}</td><td>{{ discount.starts_on }} – {% if discount.ends_on %}{{ discount.ends_on }}{% else %}No end{% endif %}</td><td>{{ discount.used_count }}{% if discount.max_uses %} / {{ discount.max_uses }}{% else %} / Unlimited{% endif %}</td><td><span class="status-badge{% if not discount.is_active %} status-badge--muted{% endif %}">{% if discount.is_active %}Active{% else %}Archived{% endif %}</span></td></tr>{% empty %}<tr><td colspan="7"><div class="empty-state"><h2>No discounts found</h2><p>Add a fixed amount or percentage rule for a product or subscription.</p><a class="button button--primary" href="{% url 'offers:discount_create' %}">Add discount</a></div></td></tr>{% endfor %}
+</tbody></table></div>{% include 'components/table_pagination.html' with page_obj=page_obj %}</section>
+{% endblock %}

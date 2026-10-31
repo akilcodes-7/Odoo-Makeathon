@@ -1,119 +1,81 @@
 # Brightloop — Subscription Management System
 
-**Proposed solution · Odoo Makeathon**
+Hackathon project for managing products, recurring plans, quotations, subscriptions, invoices, discounts, payments, and customer self-service.
 
-Repository: https://github.com/akilcodes-7/Odoo-Makeathon
+**Current status: core features exist, but functional acceptance is incomplete.** The [31 October functional audit](docs/AUDIT_2026-10-31.md) reproduced ten defects, including blocked product creation, tax and money-form corruption, and a stale draft edit that can undo confirmation. The existing suite discovers 96 tests: 93 pass and three concurrency cases skip in the default database; those three pass separately on disk. Earlier backend performance measurements passed, but they do not establish complete functionality. Exact viewport checks, browser timing and human Git participation evidence remain incomplete. See the audit for the repair order, plus [requirements](docs/REQUIREMENTS.md), [demo/check evidence](docs/DEMO_AND_CHECKS.md), the [handoff](docs/TEAM_HANDOFF.md), and [progress log](docs/HACKATHON_LOG.md).
 
-This submission describes the planned build and its acceptance criteria. It contains no application code and does not claim that the features or checks below are complete. The product brief and participant-supplied hackathon rules guide the scope; implementation choices are identified below.
+## Start here
 
-## 1. Problem and intended outcome
+**Shared team branch: `dev` (lowercase).** All current implementation, audit findings and the single [repair and UI redesign plan](docs/REPAIR_AND_UI_REDESIGN_PLAN.md) are handed off through this branch. Repairs and the redesign are still planned. Start with the plan and [current handoff](docs/TEAM_HANDOFF.md).
 
-Managing recurring contracts across separate records makes it difficult to track renewals, generate accurate invoices, reconcile payments, and understand recurring revenue. Brightloop will connect customers, subscriptions, billing, and payments in one local application with a customer self-service portal.
+Clone the team branch explicitly because the repository's default branch is different:
 
-**End-to-end flow:** customer → product/variant and recurring plan → quotation → confirmed subscription → activation → recurring invoice → payment → updated balance and dashboard → permitted renewal or closure.
+```text
+git clone --branch dev https://github.com/akilcodes-7/Odoo-Makeathon.git
+cd Odoo-Makeathon
+```
 
-## 2. Users and responsibilities
-
-| Role | Planned access |
+| Reader | Read first |
 | --- | --- |
-| Admin | Configure products, variants, plans, taxes, discounts and quotation templates; create staff; manage operational records. |
-| Staff | Manage customers, quotations and subscriptions; generate/confirm invoices; record payments; view reports. |
-| Customer | View only their own subscriptions and confirmed/paid invoices; print invoices and request allowed subscription actions. |
+| Evaluator | This README, [requirement coverage](docs/REQUIREMENTS.md), then [progress log](docs/HACKATHON_LOG.md) |
+| Developer implementing a task | [Agent instructions](AGENTS.md), [task cards](docs/TASK_CARDS.md), and the referenced section of the [build specification](docs/IMPLEMENTATION_PLAN.md) |
+| Teammate joining at 1 pm | [team handoff](docs/TEAM_HANDOFF.md), then your task card |
+| Person preparing the demonstration | [demo and verification checklist](docs/DEMO_AND_CHECKS.md) |
 
-Customer profiles may exist without a login. Signup will create and link a customer profile atomically; staff will not link an account merely because an entered email matches. Permissions will be enforced on the server for every action and record.
+## Stack decision
 
-## 3. Chosen stack and data model
+- Python 3.12; Django 5.2.18 pinned in requirements.txt.
+- SQLite for a local database; Django ORM and migrations.
+- Django templates and forms, custom local CSS, and small vanilla JavaScript enhancements.
+- Django sessions, a custom email-based user model, server-enforced roles, and Django password-reset tokens.
+- Local email output by default; environment-configured SMTP for actual delivery when available.
+- Integer paise in storage and Decimal arithmetic for calculations; INR is the single demo currency.
+- A Django management command for scheduled billing, plus an internal “Run billing” action calling the same service.
 
-**Python 3.12 + Django 5.2 LTS + SQLite + Django templates/forms + local CSS and vanilla JavaScript.** Django provides authentication, migrations and server-side validation; SQLite supports a portable local demonstration. No cloud service or frontend build pipeline is required for core operation after dependency installation.
+No Node build, CDN, cloud database, payment gateway, or external API is required for the core local demonstration. Initial dependency installation requires an available package source or previously cached packages.
 
-The data model will include users, customers, products, variants, recurring plans, taxes, discounts, quotation templates and lines, subscriptions and lines, invoices and lines, invoice tax snapshots, discount redemptions, payments, and subscription events. Foreign keys and database constraints will protect relationships and financial history.
+## Scope
 
-Forms and reports will read persisted database records. A protected dashboard summary API will reuse the same reporting queries as the UI.
+Core scope includes authentication, customers, products/variants, configurable plans, quotation templates, subscription lifecycle, recurring billing, taxes, discounts, invoice actions, payments, dashboards including MRR, and a customer portal. See [requirement coverage](docs/REQUIREMENTS.md) for exact definitions and evidence still needed.
 
-## 4. Build sequence
+The UI will use a light workspace, plum navigation, teal accents, readable financial tables, responsive forms, keyboard-visible focus, and restrained motion that respects reduced-motion preferences.
 
-| Stage | Planned deliverable | Acceptance criterion |
-| --- | --- | --- |
-| Foundation | Django project, custom user model, schema/migrations, shared UI shell and demo seed command. | Fresh setup migrates successfully; repeated seeding does not duplicate demo records. |
-| Authentication | Signup, login, password reset and role permissions. | Emails are unique ignoring case; passwords require 9+ characters, uppercase, lowercase and a special character; only admins create staff. |
-| Configuration | Customer management; products with variant surcharges; plans with daily/weekly/monthly/yearly periods, minimum quantity, dates and lifecycle flags; taxes. | Invalid values are rejected; edits persist and appear in the UI. |
-| Quotations and subscriptions | Templates with validity days; numbered contracts, dates, payment terms, lines and lifecycle actions. | Draft → Quotation → Confirmed → Active → Closed follows centralized rules; expired quotations cannot confirm. |
-| Recurring billing | Billing cursor, catch-up processing, tax calculation, invoice snapshots, management command and “Run billing” action. | Repeated or concurrent processing does not create duplicate invoices or skip unbilled periods. |
-| Discounts | Admin-managed fixed/percentage rules with minimum purchase/quantity, dates, usage limits and product/subscription scope. | Eligibility and capacity are enforced transactionally; old invoices retain original discounts. |
-| Invoices and payments | Confirm/cancel/send/print; payment method, amount, date and note; partial/full balances. | No overpayment or duplicate payment; full settlement marks an invoice Paid. |
-| Reporting and portal | Active subscriptions, collected revenue, outstanding/overdue balances, MRR, filters and customer actions. | Metrics reconcile with stored records; customers cannot access another customer's data. |
-| Integration and delivery | Responsive review, permission/financial checks, performance evidence, documentation and demonstration. | Actual results and limitations are recorded; the final demo follows the full customer-to-payment flow. |
+## Schedule and collaboration
 
-## 5. Financial and lifecycle safeguards
+**Hard deadlines, 31 October 2026 IST:** repository URL submitted at **09:00**; evaluator collaborator access by **10:00**; coding stops at **17:00**; video URL submitted by **17:30**. These are participant-supplied deadlines. See [deadline owners and status](docs/DEADLINES.md); submission permissions and actual completion remain unverified.
 
-- Store money as integer paise; use Decimal arithmetic and explicit rounding, never floating-point money. INR is the initial currency.
-- Keep subscription and invoice transitions in one lifecycle service. Invoice flow is Draft → Confirmed → Paid; cancellation is allowed only under defined unpaid-invoice rules.
-- Store `next_invoice_date`; enforce a unique `(subscription, period_start)` constraint. Invoice creation, discount reservation and cursor advancement will share one transaction per period. Bounded catch-up leaves remaining periods due for the next run.
-- Use calendar-aware month/year boundaries. Snapshot customer billing details, prices, taxes and discount allocations on invoices so later edits cannot alter history.
-- Guard discount usage increments in the invoice transaction. Project choice: one eligible rule per invoice, selecting the greatest saving with a deterministic tie-break; no stacking.
-- Record payments atomically with a unique request key; validate the current balance before insertion. Calculate overdue from confirmed unpaid balance and due date, rather than storing an overdue status.
-- Enforce plan flags for auto-close, close, pause and renewal. Project choices: pause from the next unpaid period; renewal creates a new draft for staff confirmation; prorate a shortened final period.
-- Define collected revenue as payments received. Show MRR before discounts/tax, normalized as daily × 365/12, weekly × 52/12, monthly unchanged, yearly ÷ 12; label it as an estimate.
-- Generate billing through a management command and document optional local scheduling. Print uses a print-friendly page. Offline email uses console/file output and is labeled as local output, not delivered mail.
+- **9:00 am–1:00 pm IST:** solo foundation, authentication, catalog, subscriptions, and billing spine.
+- **1:00 pm–5:00 pm IST:** teammate 1 owns discounts/templates; teammate 2 payments/invoice delivery; teammate 3 dashboard/portal; lead owns integration and shared code.
+- `dev` is the shared integration and handoff branch. Each teammate uses their own Git identity and isolated task branch where required by the repository workflow, then integrates completed work into `dev`. Do not manufacture contributions or backdate activity.
+- Planned times are not actual completion timestamps. Actual progress belongs in the [hackathon log](docs/HACKATHON_LOG.md).
+- Akilan is the provisional portal submitter; repository owner handles evaluator access. The 17:00–17:30 period is for the frozen-build video and submission, not additional coding.
 
-## 6. Hackathon requirement coverage
+## Run the local application
 
-### Must have
+Verified with Python 3.12.14 and Django 5.2.18. Create a virtual environment, install the pinned requirement, migrate and run the application with the audit limitations recorded above:
 
-| Supplied requirement | Planned approach |
-| --- | --- |
-| Dynamic data, not static JSON | SQLite-backed forms, lists, invoices and dashboard API; seed data only initializes the demo. |
-| Clean, responsive, consistent UI | Shared layouts, colors, form controls, financial tables and mobile navigation. |
-| Robust input validation | Django forms, service validation and database constraints; useful inline errors. |
-| Intuitive navigation and spacing | Role-aware menus, clear headings/actions, breadcrumbs and consistent spacing. |
-| Team Git participation | Each contributor uses their own identity, feature branches, meaningful commits and PR reviews. |
+```text
+python3.12 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+python manage.py migrate
+python manage.py seed_demo
+python manage.py runserver
+```
 
-### Nice to have
+`seed_demo` creates local demo users for the three roles. Choose one local-only password when prompted; it must have at least nine characters, uppercase and lowercase letters, and a special character. The command does not print or reset existing passwords. Its emails are `admin@brightloop.test`, `staff@brightloop.test`, and `customer@brightloop.test`. Email defaults to the console backend; actual SMTP delivery needs environment configuration. Billing is available through the management command and staff POST action; no external scheduler or payment gateway is configured.
 
-| Supplied guideline | Planned approach |
-| --- | --- |
-| Backend APIs, data modeling and local database | Django ORM, SQLite and authenticated dashboard summary endpoint. |
-| Understand AI/code snippets | Contributors explain and adapt generated logic, recording relevant decisions in PRs. |
-| Offline/local operation | Local assets, database and email fallback; document installation and actual-email network needs. |
-| Use technology only when it adds value | Keep the stack small; add dependencies only for a demonstrated requirement. |
+To create a repeat-safe local benchmark dataset, run `python manage.py seed_scale --subscriptions 5000` after `seed_demo`, then measure authenticated routes with `python manage.py benchmark_pages --warm-samples 10`. These commands write only to the configured local database. Run the full unit/integration suite with `python manage.py test`; run real concurrent-write checks against a temporary on-disk test DB with `TEST_DATABASE_PATH=/tmp/brightloop-concurrency.sqlite3 python manage.py test tests.test_concurrency`.
 
-## 7. UI and performance
+**Known limitations:** responsive browser screenshots at 390, 768, and 1440 px have not been captured; the 5,000-record timings measure Django request handling, not full browser rendering or concurrent load. Delivery uses the configured Django email backend; no background scheduler, live payment gateway, refunds, or credit notes are implemented. Portal submission, evaluator access, and video submission remain unverified. The pushed task branch and `dev` refs are recorded in the handoff.
 
-Use a light workspace, plum navigation, teal accents, readable money columns and reusable components. Mobile navigation will become a drawer; forms will stack and wide tables will scroll within their containers. Support keyboard focus, visible errors and reduced-motion preferences. Restrained 120–200 ms transitions will enhance buttons, drawers and page entry.
+## Evaluation evidence
 
-Seed approximately 5,000 subscriptions **with related invoices and payments**. Use pagination, relevant indexes, joined queries and database aggregates. Measure representative pages against the under-two-second target and record dataset size, machine context and timings. Server response measurements and browser observations will be reported separately; the target remains unverified until measured.
+All completion claims should link to actual commits, PRs, screenshots, or captured check results. Current results and limitations are in [the demo/check record](docs/DEMO_AND_CHECKS.md) and [requirements](docs/REQUIREMENTS.md). Implementation commit `0b436d9` and documentation commits `cee28fb`/`c9638c8` are on `codex/remaining-core` and `dev`; the fresh clone used for setup verification was from the pushed `dev`. The remote default branch remains unchanged.
 
-## 8. Team schedule and documentation
+## Source material
 
-Times are planned for **31 October 2026, IST**, not records of completed work. Teammates join only after 13:00.
+- User-provided `Subscription_Management_System.pdf`, four pages.
+- [Hackathon portal](https://hackathon.odoo.com/hackathon/details/79054). The portal requires authentication; its must-have and nice-to-have lists were supplied directly by the participant and are recorded in [requirements](docs/REQUIREMENTS.md).
+- Participant-provided solo/team schedule and subsequent implementation decisions.
 
-| Time | Owner | Focus |
-| --- | --- | --- |
-| 09:00–09:40 | Lead | Foundation, schema and common UI. |
-| 09:40–10:30 | Lead | Authentication, roles and customer linking. |
-| 10:30–11:30 | Lead | Product, variant, plan and tax management. |
-| 11:30–13:00 | Lead | Subscriptions, billing spine, shared service contracts and handoff. |
-| 13:00–16:15 | Teammate 1 | Discounts and quotation templates. |
-| 13:00–16:15 | Teammate 2 | Payments, balances, invoice send/print. |
-| 13:00–16:15 | Teammate 3 | Dashboard, MRR and customer portal. |
-| 13:00–17:00 | Lead | Integration, permissions, validation, reviews and performance checkpoint around 14:30. |
-| 16:15–17:00 | Everyone | Final integration, evidence, demo rehearsal and code freeze. |
-| 17:00–17:30 | Submission owner | Frozen-build video, upload and link submission. |
-
-The lead owns shared models/services and layout assets; teammates own their feature modules. Each contributor will maintain timestamped progress, checks and blockers. A shared handoff will identify working features, pending tasks and integration dependencies; a consolidated log will record decisions and verified milestones. Actual progress will never be backdated to match this schedule.
-
-Participant-supplied administrative deadlines: repository URL at **09:00**, evaluator access by **10:00**, coding ends **17:00**, video link by **17:30**. Portal permissions and completion must be verified separately. The repository owner handles evaluator access; Akilan is the provisional portal submitter. This plan does not claim any submission or invitation is complete.
-
-## 9. Final validation and demonstration
-
-1. Verify fresh setup and seeded admin/staff/customer access.
-2. Create a customer, select a variant and recurring plan, issue a quotation, confirm and activate it.
-3. Run billing twice to demonstrate duplicate prevention; inspect discount/tax snapshots and totals.
-4. Record partial and final payments; demonstrate outstanding balance, Paid status and invoice printing.
-5. Show dashboard totals/MRR and the customer's restricted portal with a permitted renewal or close action.
-6. Present validation failures, permission checks, responsive screenshots, measured performance and real Git contributions.
-7. Record the final code commit, known limitations and video link; verify evaluator access and saved submission separately.
-
-Initial scope excludes payment gateways, refunds/credit notes, multi-currency, mid-cycle upgrades and advanced analytics. These are project deferrals, separate from the organizer's nice-to-have guidelines. Required functionality and accurate evidence take priority over visual extras.
-
-**Sources:** participant-provided `Subscription_Management_System.pdf`; participant-pasted rules from the [hackathon portal](https://hackathon.odoo.com/hackathon/details/79054); participant-supplied schedule and deadlines. Authenticated portal requirements have not been independently verified.

@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Team{% endblock %}
+{% block topbar_context %}Team access{% endblock %}
+{% block page_title %}Team{% endblock %}
+{% block page_description %}<p class="page-description">Manage Brightloop staff accounts.</p>{% endblock %}
+{% block page_actions %}<a class="button button--primary" href="{% url 'team:new' %}">Add staff member</a>{% endblock %}
+{% block content %}<section class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Account</th></tr></thead><tbody>{% for member in staff %}<tr><td>{{ member.get_full_name|default:'—' }}</td><td>{{ member.email }}</td><td>{% if member.is_active %}Active{% else %}Inactive{% endif %}</td></tr>{% empty %}<tr><td colspan="3"><div class="empty-state"><h2>No staff accounts yet</h2><p>Create a staff login to give a teammate access to the workspace.</p></div></td></tr>{% endfor %}</tbody></table></div></section>{% endblock %}

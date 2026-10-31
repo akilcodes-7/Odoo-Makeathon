@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Taxes{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/catalog.css' %}">{% endblock %}
+{% block topbar_context %}Product &amp; plan catalog{% endblock %}
+{% block page_title %}Taxes{% endblock %}
+{% block page_description %}<p class="page-description">Configured price-exclusive tax rates. Invoice records save their own tax snapshots.</p>{% endblock %}
+{% block page_actions %}{% if user.role == 'ADMIN' %}<a class="button button--primary" href="{% url 'catalog:tax_create' %}">Add tax</a>{% endif %}{% endblock %}
+{% block content %}
+<form method="get" class="filter-row catalog-search"><div class="form-field"><label class="field-label" for="tax-search">Search taxes</label><input id="tax-search" name="q" value="{{ query }}" type="search" placeholder="Tax name"></div><button class="button button--secondary" type="submit">Search</button></form>
+<section class="table-card" aria-label="Tax rates"><div class="table-scroll"><table class="data-table"><thead><tr><th>Tax</th><th class="numeric">Rate</th><th></th></tr></thead><tbody>{% for tax in page_obj %}<tr><td class="table-primary">{{ tax.name }}</td><td class="numeric">{{ tax.percent_display }}</td><td>{% if user.role == 'ADMIN' %}<a href="{% url 'catalog:tax_edit' tax.pk %}">Edit</a> <form class="inline-form" method="post" action="{% url 'catalog:tax_archive' tax.pk %}">{% csrf_token %}<button class="text-button" type="submit">Archive</button></form>{% endif %}</td></tr>{% empty %}<tr><td colspan="3"><div class="empty-state"><h2>No tax rates found</h2><p>Add a configured rate for use on future invoices.</p>{% if user.role == 'ADMIN' %}<a class="button button--primary" href="{% url 'catalog:tax_create' %}">Add tax</a>{% endif %}</div></td></tr>{% endfor %}</tbody></table></div>{% include 'components/table_pagination.html' with page_obj=page_obj %}</section>
+{% endblock %}

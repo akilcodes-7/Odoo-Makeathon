@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load money %}
+{% block title %}Your account{% endblock %}
+{% block topbar_context %}Your account{% endblock %}
+{% block page_title %}Welcome to your account{% endblock %}
+{% block page_description %}<p class="page-description">A private summary of your Brightloop subscriptions and invoices.</p>{% endblock %}
+{% block content %}
+<section class="metric-grid" aria-label="Your account summary">
+  <article class="metric-card"><span class="metric-label">Active subscriptions</span><strong class="metric-value">{{ active_count }}</strong></article>
+  <article class="metric-card"><span class="metric-label">Your subscriptions</span><strong class="metric-value">{{ subscription_count }}</strong></article>
+  <article class="metric-card"><span class="metric-label">Invoices</span><strong class="metric-value">{{ invoice_count }}</strong></article>
+  <article class="metric-card"><span class="metric-label">Outstanding</span><strong class="metric-value">{{ outstanding_paise|money }}</strong></article>
+</section>
+{% if next_subscription %}<section class="section-heading"><div><h2>Next billing date</h2><p><a href="{% url 'portal:subscription_detail' next_subscription.pk %}">{{ next_subscription.number }}</a> · {{ next_subscription.next_invoice_date }}</p></div></section>{% endif %}
+<section class="section-heading"><div><h2>Recent invoices</h2><p>Only confirmed and paid invoices appear here.</p></div><a class="button button--secondary button--small" href="{% url 'portal:invoices' %}">All invoices</a></section>
+<div class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Invoice</th><th>Subscription</th><th>Date</th><th>Status</th><th class="numeric">Total</th><th></th></tr></thead><tbody>
+{% for invoice in recent_invoices %}<tr><td>{{ invoice.number }}</td><td>{{ invoice.subscription.number }}</td><td>{{ invoice.invoice_date }}</td><td>{{ invoice.get_status_display }}</td><td class="numeric">{{ invoice.total_paise|money }}</td><td><a href="{% url 'portal:invoice_detail' invoice.pk %}">View</a></td></tr>{% empty %}<tr><td colspan="6">You have no confirmed invoices yet.</td></tr>{% endfor %}
+</tbody></table></div></div>
+{% endblock %}

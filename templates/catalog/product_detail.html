@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/catalog.css' %}">{% endblock %}
+{% block topbar_context %}Product &amp; plan catalog{% endblock %}
+{% block breadcrumbs %}<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="{% url 'catalog:products' %}">Products</a><span aria-hidden="true">/</span><span>{{ product.name }}</span></nav>{% endblock %}
+{% block page_title %}{{ product.name }}{% endblock %}
+{% block page_description %}<p class="page-description">{{ product.get_type_display }} · {{ product.sales_price_display }} sales price</p>{% endblock %}
+{% block page_actions %}{% if user.role == 'ADMIN' %}<a class="button button--secondary" href="{% url 'catalog:product_edit' product.pk %}">Edit</a>{% if product.is_active %}<form method="post" action="{% url 'catalog:product_archive' product.pk %}">{% csrf_token %}<button class="button button--danger" type="submit">Archive</button></form>{% endif %}{% endif %}{% endblock %}
+{% block content %}
+<div class="content-grid"><section class="card"><h2>Product details</h2><dl class="catalog-details"><dt>Type</dt><dd>{{ product.get_type_display }}</dd><dt>Sales price</dt><dd>{{ product.sales_price_display }}</dd><dt>Internal cost</dt><dd>{{ product.cost_price_display }}</dd><dt>Status</dt><dd>{% if product.is_active %}Active{% else %}Archived{% endif %}</dd><dt>Notes</dt><dd>{{ product.notes|default:'—'|linebreaksbr }}</dd></dl></section>
+<section class="card"><div class="section-heading"><div><h2>Variants</h2><p>One variant may be selected per subscription line.</p></div>{% if user.role == 'ADMIN' and product.is_active %}<a class="button button--secondary button--small" href="{% url 'catalog:variant_create' product.pk %}">Add variant</a>{% endif %}</div><ul class="variant-list">{% for variant in product.variants.all %}{% if variant.is_active %}<li><span><strong>{{ variant.attribute_name }}:</strong> {{ variant.attribute_value }}<small>Extra price {{ variant.extra_price_display }}</small></span>{% if user.role == 'ADMIN' %}<span class="variant-actions"><a href="{% url 'catalog:variant_edit' variant.pk %}">Edit</a><form method="post" action="{% url 'catalog:variant_archive' variant.pk %}">{% csrf_token %}<button class="text-button" type="submit">Archive</button></form></span>{% endif %}</li>{% endif %}{% empty %}<li>No active variants configured.</li>{% endfor %}</ul></section></div>
+{% endblock %}

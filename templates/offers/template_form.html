@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} · Brightloop{% endblock %}
+{% block content %}
+<div class="page-header"><div><p class="eyebrow">Offers</p><h1>{{ page_title }}</h1><p>Template values are copied to a draft when staff selects this template.</p></div></div>
+<form method="post" class="stack-form">{% csrf_token %}
+{% if form.non_field_errors or formset.non_form_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}{{ formset.non_form_errors }}</div>{% endif %}
+<section class="panel form-grid">{% for field in form %}<div class="field{% if field.name == 'notes' %} field--wide{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{{ field.errors }}</div>{% endfor %}</section>
+<section class="panel"><h2>Quotation lines</h2>{{ formset.management_form }}
+<div class="table-wrap"><table><thead><tr><th>Product</th><th>Variant</th><th>Primary</th><th>Quantity</th><th>Unit price</th><th>Taxes</th><th>Position</th><th>Remove</th></tr></thead><tbody>{% for line in formset %}<tr>{% for hidden in line.hidden_fields %}{{ hidden }}{% endfor %}<td>{{ line.product }}{{ line.product.errors }}</td><td>{{ line.variant }}{{ line.variant.errors }}</td><td>{{ line.is_primary }}</td><td>{{ line.quantity }}{{ line.quantity.errors }}</td><td>{{ line.unit_price }}{{ line.unit_price.errors }}</td><td>{{ line.taxes }}{{ line.taxes.errors }}</td><td>{{ line.position }}</td><td>{% if line.DELETE %}{{ line.DELETE }}{% endif %}</td></tr>{% endfor %}</tbody></table></div></section>
+<div class="form-actions"><a class="button button--secondary" href="{% url 'offers:template_list' %}">Cancel</a><button class="button button--primary" type="submit">Save template</button></div>
+</form>
+{% endblock %}
