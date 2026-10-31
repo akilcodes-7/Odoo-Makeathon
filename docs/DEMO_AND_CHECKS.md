@@ -144,3 +144,5 @@ All final code changes/merges/pushes finish before 17:00 IST. Target video submi
 - [ ] Uploaded video plays for intended viewers.
 - [ ] Akilan/verified submitter saved the video URL before 17:30; receipt/time recorded.
 
+
+**Dashboard UI, 2026-10-31 14:45 IST:** Following the linked L.up visual direction, the operations dashboard now uses a near-black canvas and icon rail, blue subscription highlight, gradient balance panel and dark finance/activity cards. Existing real totals, role scoping, query filters and pagination remain connected. Admin view and customer-scoped view were reviewed at the current 1280×720 browser size; the screenshot is saved in ignored `.demo/dashboard-reference-redesign.png`. Automated tests were not run for the template/CSS-only update. Smaller viewport and keyboard review are still pending.

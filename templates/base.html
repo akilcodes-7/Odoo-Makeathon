@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="{% static 'css/components.css' %}">
   {% block page_css %}{% endblock %}
 </head>
-<body class="app-body">
+<body class="app-body{% block body_class %}{% endblock %}">
   <a class="skip-link" href="#main-content">Skip to main content</a>
   <div class="app-shell">
     <div class="sidebar-scrim" data-drawer-scrim hidden></div>
@@ -23,49 +23,49 @@
       <div class="workspace-label">WORKSPACE</div>
       <nav class="primary-nav">
         {% if user.is_authenticated and user.role == 'CUSTOMER' %}
-          <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} is-active{% endif %}" href="{% url 'portal:dashboard' as portal_dashboard_url %}{% url 'portal:index' as portal_fallback %}{{ portal_dashboard_url|default:portal_fallback|default:'#' }}">
+          <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} is-active{% endif %}" aria-label="Overview" title="Overview" href="{% url 'portal:dashboard' as portal_dashboard_url %}{% url 'portal:index' as portal_fallback %}{{ portal_dashboard_url|default:portal_fallback|default:'#' }}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg><span>Overview</span>
           </a>
-          <a class="nav-link{% if request.resolver_match.namespace == 'portal' and request.resolver_match.url_name == 'subscriptions' %} is-active{% endif %}" href="{% url 'portal:subscriptions' as portal_subscriptions_url %}{% url 'portal:index' as portal_fallback %}{{ portal_subscriptions_url|default:portal_fallback|default:'#' }}">
+          <a class="nav-link{% if request.resolver_match.namespace == 'portal' and request.resolver_match.url_name == 'subscriptions' %} is-active{% endif %}" aria-label="My subscriptions" title="My subscriptions" href="{% url 'portal:subscriptions' as portal_subscriptions_url %}{% url 'portal:index' as portal_fallback %}{{ portal_subscriptions_url|default:portal_fallback|default:'#' }}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7h-9M14 3l-4 4 4 4M4 17h9m-5-4 4 4-4 4"/></svg><span>My subscriptions</span>
           </a>
-          <a class="nav-link{% if request.resolver_match.namespace == 'portal' and request.resolver_match.url_name == 'invoices' %} is-active{% endif %}" href="{% url 'portal:invoices' as portal_invoices_url %}{% url 'portal:index' as portal_fallback %}{{ portal_invoices_url|default:portal_fallback|default:'#' }}">
+          <a class="nav-link{% if request.resolver_match.namespace == 'portal' and request.resolver_match.url_name == 'invoices' %} is-active{% endif %}" aria-label="My invoices" title="My invoices" href="{% url 'portal:invoices' as portal_invoices_url %}{% url 'portal:index' as portal_fallback %}{{ portal_invoices_url|default:portal_fallback|default:'#' }}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7m-7 4h7"/></svg><span>My invoices</span>
           </a>
-          <a class="nav-link{% if request.resolver_match.namespace == 'portal' and request.resolver_match.url_name == 'profile' %} is-active{% endif %}" href="{% url 'portal:profile' as portal_profile_url %}{% url 'portal:index' as portal_fallback %}{{ portal_profile_url|default:portal_fallback|default:'#' }}">
+          <a class="nav-link{% if request.resolver_match.namespace == 'portal' and request.resolver_match.url_name == 'profile' %} is-active{% endif %}" aria-label="Profile" title="Profile" href="{% url 'portal:profile' as portal_profile_url %}{% url 'portal:index' as portal_fallback %}{{ portal_profile_url|default:portal_fallback|default:'#' }}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profile</span>
           </a>
         {% else %}
-          <a class="nav-link{% if request.resolver_match.namespace == 'insights' %} is-active{% endif %}" href="{% url 'insights:dashboard' as dashboard_url %}{% url 'insights:index' as dashboard_fallback %}{{ dashboard_url|default:dashboard_fallback|default:'#' }}">
+          <a class="nav-link{% if request.resolver_match.namespace == 'insights' %} is-active{% endif %}" aria-label="Overview" title="Overview" href="{% url 'insights:dashboard' as dashboard_url %}{% url 'insights:index' as dashboard_fallback %}{{ dashboard_url|default:dashboard_fallback|default:'#' }}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="11" width="7" height="10" rx="2"/><rect x="3" y="14" width="8" height="7" rx="2"/></svg><span>Overview</span>
           </a>
-          <a class="nav-link{% if request.resolver_match.namespace == 'subscriptions' %} is-active{% endif %}" href="{% url 'subscriptions:list' as subscriptions_url %}{% url 'subscriptions:index' as subscriptions_fallback %}{{ subscriptions_url|default:subscriptions_fallback|default:'#' }}">
+          <a class="nav-link{% if request.resolver_match.namespace == 'subscriptions' %} is-active{% endif %}" aria-label="Subscriptions" title="Subscriptions" href="{% url 'subscriptions:list' as subscriptions_url %}{% url 'subscriptions:index' as subscriptions_fallback %}{{ subscriptions_url|default:subscriptions_fallback|default:'#' }}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7h-9M14 3l-4 4 4 4M4 17h9m-5-4 4 4-4 4"/></svg><span>Subscriptions</span>
           </a>
-          <a class="nav-link{% if request.resolver_match.namespace == 'catalog' %} is-active{% endif %}" href="{% url 'catalog:list' as catalog_url %}{% url 'catalog:index' as catalog_fallback %}{{ catalog_url|default:catalog_fallback|default:'#' }}">
+          <a class="nav-link{% if request.resolver_match.namespace == 'catalog' %} is-active{% endif %}" aria-label="Products and plans" title="Products and plans" href="{% url 'catalog:list' as catalog_url %}{% url 'catalog:index' as catalog_fallback %}{{ catalog_url|default:catalog_fallback|default:'#' }}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 5h16v15H4zM8 3v4m8-4v4M4 10h16"/></svg><span>Products &amp; plans</span>
           </a>
-          <a class="nav-link{% if request.resolver_match.namespace == 'customers' %} is-active{% endif %}" href="{% url 'customers:list' as customers_url %}{{ customers_url|default:'#' }}">
+          <a class="nav-link{% if request.resolver_match.namespace == 'customers' %} is-active{% endif %}" aria-label="Customers" title="Customers" href="{% url 'customers:list' as customers_url %}{{ customers_url|default:'#' }}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0m2-9a3 3 0 1 0 0-6m1 9a5 5 0 0 1 3 5"/></svg><span>Customers</span>
           </a>
-          <a class="nav-link{% if request.resolver_match.namespace == 'finance' and 'invoice' in request.resolver_match.url_name %} is-active{% endif %}" href="{% url 'finance:invoices' as invoices_url %}{% url 'finance:index' as finance_fallback %}{{ invoices_url|default:finance_fallback|default:'#' }}">
+          <a class="nav-link{% if request.resolver_match.namespace == 'finance' and 'invoice' in request.resolver_match.url_name %} is-active{% endif %}" aria-label="Invoices" title="Invoices" href="{% url 'finance:invoices' as invoices_url %}{% url 'finance:index' as finance_fallback %}{{ invoices_url|default:finance_fallback|default:'#' }}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7m-7 4h7"/></svg><span>Invoices</span>
           </a>
-          <a class="nav-link{% if request.resolver_match.namespace == 'finance_payments' %} is-active{% endif %}" href="{% url 'finance_payments:list' %}">
+          <a class="nav-link{% if request.resolver_match.namespace == 'finance_payments' %} is-active{% endif %}" aria-label="Payments" title="Payments" href="{% url 'finance_payments:list' %}">
             <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18m-14 5h4"/></svg><span>Payments</span>
           </a>
           {% if user.is_authenticated and user.role == 'STAFF' %}
-            <a class="nav-link{% if request.resolver_match.namespace == 'offers' %} is-active{% endif %}" href="{% url 'offers:template_list' %}">
+            <a class="nav-link{% if request.resolver_match.namespace == 'offers' %} is-active{% endif %}" aria-label="Quotation templates" title="Quotation templates" href="{% url 'offers:template_list' %}">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM9 12h7m-7 4h7"/></svg><span>Quotation templates</span>
             </a>
           {% endif %}
           {% if user.is_authenticated and user.role == 'ADMIN' %}
             <div class="nav-divider"></div>
             <div class="workspace-label nav-section-label">CONFIGURATION</div>
-            <a class="nav-link{% if request.resolver_match.namespace == 'offers' %} is-active{% endif %}" href="{% url 'offers:discounts' as discounts_url %}{% url 'offers:index' as offers_fallback %}{{ discounts_url|default:offers_fallback|default:'#' }}">
+            <a class="nav-link{% if request.resolver_match.namespace == 'offers' %} is-active{% endif %}" aria-label="Discounts and quotes" title="Discounts and quotes" href="{% url 'offers:discounts' as discounts_url %}{% url 'offers:index' as offers_fallback %}{{ discounts_url|default:offers_fallback|default:'#' }}">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 12 12 4H5a1 1 0 0 0-1 1v7l8 8z"/><circle cx="8" cy="8" r="1"/></svg><span>Discounts &amp; quotes</span>
             </a>
-            <a class="nav-link{% if request.resolver_match.namespace == 'team' %} is-active{% endif %}" href="{% url 'team:list' %}">
+            <a class="nav-link{% if request.resolver_match.namespace == 'team' %} is-active{% endif %}" aria-label="Team accounts" title="Team accounts" href="{% url 'team:list' %}">
               <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0m2-9a3 3 0 1 0 0-6m1 9a5 5 0 0 1 3 5"/></svg><span>Team accounts</span>
             </a>
           {% endif %}

@@ -1,6 +1,6 @@
 # Current handoff — implementation integration
 
-**Last recorded update:** 2026-10-31 14:27 IST. Current work is I1 evaluator preparation on `Main`, based on published `2ded2a6` (A07 fix). The earlier `41ebeea` contains functional audit repairs and `0e5595b` the UI redesign. This update adds one-command startup, four local accounts, persistent evaluation data and tested end-to-end forms. Full suite: 127 discovered, 124 passed and 3 skipped; separate on-disk concurrency: all 3 passed. Fresh source/environment setup and repeat-start preservation pass. See [evaluator guide](EVALUATOR_GUIDE.md) and [lead log](logs/lead.md). Older audit/open-status statements below are historical and must not be treated as a new audit against this build. Full visual acceptance and external submission evidence remain incomplete.
+**Last recorded update:** 2026-10-31 14:45 IST. Current branch `Main` contains evaluator-ready setup commit `854df0f`; the dashboard refresh described in [T3A](TASK_CARDS.md) is now in progress locally. It applies the linked L.up dark workspace style to admin and customer dashboards, with active subscriptions, cash collections and role-scoped finance data. Both roles were checked in the browser at 1280×720; small viewport and keyboard reviews remain. Earlier audit/open-status statements below are historical and do not supersede the published A01–A10 fixes. I1 setup/check results are in [evaluator guide](EVALUATOR_GUIDE.md) and [lead log](logs/lead.md).
 
 ## Team starting point
 
@@ -33,7 +33,7 @@ Read `docs/REPAIR_AND_UI_REDESIGN_PLAN.md` first, then the assigned audit findin
 
 | Owner | Branch target | Cards | Actual status | Blocker/next action |
 | --- | --- | --- | --- | --- |
-| Lead / repo owner | `Main` | I1 evaluator integration; A07 | One-command setup, persistent data/accounts and workflow verification complete locally; 124 default tests + 3 separate concurrency checks passed. | Publish tested evaluator update; rehearse the guide. Remaining viewport and external submission gates are not certified. |
+| Lead / repo owner | `Main` | I1 evaluator integration; T3A dashboard refresh | Evaluator startup commit `854df0f` is published. Reference-led admin/customer dashboard refresh is in progress locally and visually reviewed at 1280×720. | Commit/push T3A styling; review narrow viewport and keyboard navigation. |
 | Teammate 1 scope | `dev` | T1A, T1B | Services and template flow exist; audit A03 reproduces discount money/percentage redisplay corruption. Existing passing tests do not cover failed-form resubmission. | Fix A03 under assigned ownership; follow the repair/UI plan. No human Git activity attributed. |
 | Teammate 2 scope | `dev` | T2A, T2B | Payment service/UI and invoice send/print implemented; payment/delivery tests and payment concurrency pass. | Finance UI rollout and integration verification under assigned ownership; no human Git activity attributed. |
 | Teammate 3 scope | `dev` | T3A, T3B | Reporting/portal checks pass, but renewal presentation, invoice bounds and visual acceptance remain incomplete. | Follow portal/UI repairs and required viewport checks; no human Git activity attributed. |
