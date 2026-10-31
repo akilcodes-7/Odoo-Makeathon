@@ -90,6 +90,22 @@ All times are Asia/Kolkata (IST). Planned times are kept in the implementation p
 - **Scope:** This verifies the pushed `dev` snapshot before the current docs-only update; no implementation files changed. Temporary clone/database remained outside Git.
 - **Next:** Commit the recorded setup evidence, re-fetch and fast-forward only if `dev` remains unchanged, then push task branch and `dev`, read back refs, and clean temporary files.
 
+## 2026-10-31 11:51 IST — Functional audit found acceptance failures
+
+- **Scope:** Read-only application audit at local `dev` commit `32f797d`; delegated independent lifecycle/billing and access/view reviews, plus integrated checks and isolated endpoint/form probes. No application code or demo data changed.
+- **Findings:** Ten reproduced defects recorded in `docs/AUDIT_2026-10-31.md`. Highest priority: stale draft save reverts confirmation, tax editing divides rates twice, failed forms alter money/rate inputs, and product creation never binds POST data. Other defects cover malformed plan IDs, archived confirmation, final-period renewal, paused auto-close and billing date/error handling.
+- **Checks:** Full suite: 96 discovered, 93 passed, 3 skipped (13.772s); separate on-disk concurrency suite: 3 passed (0.281s). Django check, migration drift, JS syntax and whitespace checks passed. Agent focused suite passed 41 (overlapping full-suite coverage). Isolated probes demonstrate scenarios omitted by those tests.
+- **Documentation:** Added audit report and qualified earlier completion claims in README, requirement traceability, demo evidence and handoff. No fixes, commits, pushes or submission were made during this audit.
+- **Next:** Resolve A01–A04 first, then remaining confirmed defects and UI/seed acceptance gaps before the coding cutoff. Do not mark functionality complete from the old test suite alone.
+
+## 2026-10-31 12:02 IST — Single shared `dev` team handoff
+
+- **User decision:** Use the existing lowercase `dev` branch as the shared team branch and retain the repository's current default. Other branches are preserved.
+- **Remote check:** `git ls-remote --symref` and a fresh `git fetch origin dev` showed `dev` at `32f797d`, matching local `dev`. Default remained `plan-submission-17140653490169652980` at `ca69b4b`.
+- **Prepared:** The single `docs/REPAIR_AND_UI_REDESIGN_PLAN.md`, functional audit, corrected completion claims and team clone/ownership instructions for publication on `dev`.
+- **Scope:** Documentation only. No defect fixes, UI implementation, deployment or portal submission. Repair/redesign status remains planned.
+- **Next:** Commit the docs through the existing task branch, fast-forward `dev`, push only `dev`, then read back refs and check the working tree. Teammates start from `dev` and assign work from the single plan.
+
 ## Entry template
 
 Copy this for actual progress; replace all placeholders and remove irrelevant lines:

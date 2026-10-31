@@ -2,9 +2,18 @@
 
 Hackathon project for managing products, recurring plans, quotations, subscriptions, invoices, discounts, payments, and customer self-service.
 
-**Current status: core workflows implemented and locally verified.** Authentication, catalog management, quotation templates, subscription lifecycle, recurring billing, discounts, payments, invoice delivery/print, reporting, and the customer portal are database-backed and role-scoped. `manage.py test` passes 96 tests (three dedicated concurrency tests are skipped in the shared in-memory test database and pass separately on an on-disk test DB). A 5,000-subscription backend benchmark passed the 2-second route target. The 390/768/1440 visual checks, browser rendering performance, and human Git contribution/review evidence remain incomplete. See [requirements](docs/REQUIREMENTS.md), [demo/check evidence](docs/DEMO_AND_CHECKS.md), the [handoff](docs/TEAM_HANDOFF.md), and [progress log](docs/HACKATHON_LOG.md).
+**Current status: core features exist, but functional acceptance is incomplete.** The [31 October functional audit](docs/AUDIT_2026-10-31.md) reproduced ten defects, including blocked product creation, tax and money-form corruption, and a stale draft edit that can undo confirmation. The existing suite discovers 96 tests: 93 pass and three concurrency cases skip in the default database; those three pass separately on disk. Earlier backend performance measurements passed, but they do not establish complete functionality. Exact viewport checks, browser timing and human Git participation evidence remain incomplete. See the audit for the repair order, plus [requirements](docs/REQUIREMENTS.md), [demo/check evidence](docs/DEMO_AND_CHECKS.md), the [handoff](docs/TEAM_HANDOFF.md), and [progress log](docs/HACKATHON_LOG.md).
 
 ## Start here
+
+**Shared team branch: `dev` (lowercase).** All current implementation, audit findings and the single [repair and UI redesign plan](docs/REPAIR_AND_UI_REDESIGN_PLAN.md) are handed off through this branch. Repairs and the redesign are still planned. Start with the plan and [current handoff](docs/TEAM_HANDOFF.md).
+
+Clone the team branch explicitly because the repository's default branch is different:
+
+```text
+git clone --branch dev https://github.com/akilcodes-7/Odoo-Makeathon.git
+cd Odoo-Makeathon
+```
 
 | Reader | Read first |
 | --- | --- |
@@ -37,13 +46,13 @@ The UI will use a light workspace, plum navigation, teal accents, readable finan
 
 - **9:00 am–1:00 pm IST:** solo foundation, authentication, catalog, subscriptions, and billing spine.
 - **1:00 pm–5:00 pm IST:** teammate 1 owns discounts/templates; teammate 2 payments/invoice delivery; teammate 3 dashboard/portal; lead owns integration and shared code.
-- Each teammate uses their own Git identity, feature branch, meaningful commits, and PR reviews. Do not manufacture contributions or backdate activity.
+- `dev` is the shared integration and handoff branch. Each teammate uses their own Git identity and isolated task branch where required by the repository workflow, then integrates completed work into `dev`. Do not manufacture contributions or backdate activity.
 - Planned times are not actual completion timestamps. Actual progress belongs in the [hackathon log](docs/HACKATHON_LOG.md).
 - Akilan is the provisional portal submitter; repository owner handles evaluator access. The 17:00–17:30 period is for the frozen-build video and submission, not additional coding.
 
 ## Run the local application
 
-Verified with Python 3.12.14 and Django 5.2.18. Create a virtual environment, install the pinned requirement, migrate and run the placeholder UI:
+Verified with Python 3.12.14 and Django 5.2.18. Create a virtual environment, install the pinned requirement, migrate and run the application with the audit limitations recorded above:
 
 ```text
 python3.12 -m venv .venv

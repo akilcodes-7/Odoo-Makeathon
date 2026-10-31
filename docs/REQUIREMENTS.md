@@ -2,6 +2,8 @@
 
 Status at initial publication: every build requirement below is **planned, not implemented**. Replace a status only when evidence exists. Evidence should name a check and link a commit/PR or saved result; a tick alone is insufficient.
 
+**Audit status, 2026-10-31 11:51 IST:** the implementation and test evidence in the tables below does not mean full acceptance. [Audit A01–A10](AUDIT_2026-10-31.md) reproduces failures affecting W1/W3, P4/P5/P8/P9/P11/P15 and U3. These requirements are partially implemented and require repair/reverification. Exact viewport/accessibility checks also remain outstanding. No application fixes were made in the audit.
+
 ## Source distinction
 
 The PDF supplies product requirements. The website rules below were pasted by the participant after the portal required login. Decisions in the build specification fill gaps in the brief and are explicitly project assumptions, not organizer rules.
@@ -14,7 +16,7 @@ The PDF supplies product requirements. The website rules below were pasted by th
 | W2 | Responsive clean UI, consistent color/layout | Shared tokens/components and mobile navigation; locally served assets | Responsive CSS/drawer and reduced-motion support implemented; only 890×921 browser view inspected. 390/768/1440 screenshots remain pending. |
 | W3 | Robust input validation | Forms, services, DB constraints and object permissions | Implemented and tested across auth, catalog, lifecycle, billing, payment, delivery and portal suites. |
 | W4 | Intuitive navigation and proper spacing | Role-aware sidebar, headings, visible actions | Implemented; browser navigation and local dashboard rendered. Full demo rehearsal remains pending. |
-| W5 | Proper Git use by more than one member | Separate identities, branches, small commits, PR review | Incomplete: integrated code commit `0b436d9` is on local `codex/remaining-core` using the configured repo author. No PR/review or separate human teammate commits are recorded yet. |
+| W5 | Proper Git use by more than one member | Separate identities, branches, small commits, PR review | Incomplete: implementation commit `0b436d9` is published on shared `dev` using the configured repo author. User confirmed `dev` as the team handoff target. No PR/review or separate human teammate commits are recorded. |
 
 Dynamic data does not mandate WebSockets. Do not add a simulated live indicator or fabricated changing figures.
 
@@ -48,7 +50,7 @@ Dynamic data does not mandate WebSockets. Do not add a simulated live indicator 
 | P15 | Customer portal; own subscriptions/invoices and permitted close/renew | Teammate 3 T3B + lead S3 | Implemented; 9 portal tests cover scoped IDs, allowed/blocked actions, invoices, print and profile route. |
 | U1 | MRR normalized across all four periods | Teammate 3 T3A | Implemented using Decimal normalization and integer paise; hand-calculated/empty/customer-scope reporting tests pass. |
 | U2 | Attractive UI with restrained animation | Lead S0/I1; all owners use components | Core UI and reduced motion implemented; 890×921 browser view inspected. Exact 390/768/1440 and contrast/a11y review remains pending. |
-| U3 | Full hackathon documentation | Every contributor | In progress; actual test/benchmark evidence updated. Final commits/push/PR evidence, screenshots and portal/video records are pending. |
+| U3 | Full hackathon documentation | Every contributor | Audit and a single repair/UI plan prepared for handoff on shared `dev`. Implementation commit and historical check evidence are recorded; repair acceptance, screenshots, human PR/contribution evidence and portal/video records remain incomplete. |
 
 U1–U3 are explicit participant additions. The PDF asks for revenue but does not define an MRR formula. Taxes, pause/renew behavior, discount stacking, partial terms, currency, and report definitions follow the documented project assumptions.
 

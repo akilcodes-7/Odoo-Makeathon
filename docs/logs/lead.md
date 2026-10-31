@@ -61,5 +61,20 @@ Role: solo morning spine; afternoon reviews/integration/shared code. Branch targ
 - **Issue resolved:** System `python3.12` was absent and the initial package install hit sandbox DNS. Reusing the project Python interpreter and an authorized network retry completed setup. No code changed.
 - **Next:** Commit this docs-only verification, refetch/push the authorized branches, verify default branch unchanged, and remove the temporary clone/scale fixture.
 
+## 2026-10-31 11:51 IST — S0–S5/T1–T3/I1 functional audit
+
+- **Audited:** Local `dev` at `32f797d`, without modifying application code. Independent delegated reviews covered service correctness and access/views; isolated test databases protected demo data.
+- **Result:** Ten defects reproduced; `docs/AUDIT_2026-10-31.md` contains priorities, file references, reproduction details and repair order. Four P1 defects affect confirmed-contract integrity, tax editing, failed-form money/rate values and product creation. Earlier blanket completion claims were qualified in README/handoff/requirements/check evidence.
+- **Checks:** Full suite 96 discovered: 93 passed, 3 in-memory concurrency skips; separate on-disk concurrency suite 3 passed. Django check, migration drift, JS syntax and initial diff whitespace passed. Focused agent suite 41 passed overlaps the full run. Additional probes reproduced failures that passing tests miss.
+- **Limitations:** Browser viewport/accessibility, actual SMTP receipt and external portal/video status remain unverified. No fixes or Git mutations were part of this audit.
+- **Next:** Lead repairs A01–A04 first, then A05–A10 and remaining acceptance gaps before cutoff; rerun focused regression and integration checks.
+
+## 2026-10-31 12:02 IST — Shared `dev` handoff preparation
+
+- **Decision:** User confirmed existing lowercase `dev` as the shared branch; keep remote default and other branches.
+- **Verified base:** Remote `dev` fetched at `32f797d`, matching local `dev`; no newer contributor commits to integrate.
+- **Files:** Publish the audit, single repair/UI plan, README clone instructions, corrected requirement/check statuses and handoff owner board. Application code is unchanged; fixes/redesign remain planned.
+- **Next:** Commit documentation through the task branch, fast-forward and push `dev`, then verify remote refs. All team handoff links point to `dev`.
+
 Entry format: IST timestamp; card; what changed/why; files; checks/results; commit/PR; blocker; next owner/action.
 

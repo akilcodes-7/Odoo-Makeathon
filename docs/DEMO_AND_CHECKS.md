@@ -2,6 +2,8 @@
 
 The entries below record actual local checks from 2026-10-31. No external portal or video submission is represented as complete. No generated database or secret is stored in Git.
 
+**Audit update, 11:51 IST:** the passing checks below are historical evidence for their specific cases. A new [functional audit](AUDIT_2026-10-31.md) reproduced ten defects, including primary catalog and contract-freezing failures. Full functionality is not verified. The audit rerun discovered 96 tests: 93 passed and 3 skipped; dedicated on-disk concurrency checks passed all 3. No application fixes have yet been applied.
+
 ## Hard deadlines and initial repository submission
 
 See [deadline owners and status](DEADLINES.md). Repository URL was due 09:00 IST; collaborator access is due 10:00; coding stops 17:00; video URL is due 17:30 on 2026-10-31. Earlier relative 20-minute planning estimates no longer determine submission times.

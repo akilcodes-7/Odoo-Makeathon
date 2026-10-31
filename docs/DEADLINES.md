@@ -13,7 +13,7 @@ These deadlines were supplied by the participant and supersede the earlier relat
 
 At 10:54 IST, both the 09:00 repository-link and 10:00 evaluator-access deadlines had passed. The repository URL is public, but the portal submission receipt and collaborator invitations remain unverified. Integration confirmed the original `dev` base at `4ac7968`; implementation commit `0b436d9` and subsequent docs-only commits through `c9638c8` were pushed to task branch and `dev`. A fresh clone of that pushed `dev` passed setup and checks at 11:32 IST. Ask Akilan/the portal to confirm the saved submission and check whether the organizer accepts late evaluator invitations. Do not fabricate a receipt or backdate an invitation.
 
-The verified public repository is https://github.com/akilcodes-7/Odoo-Makeathon. Its `dev` branch was read at `c9638c8` after integration; the fresh clone used this published snapshot. The remote default branch is `plan-submission-17140653490169652980` and was not modified. The local `main` branch remains unchanged.
+The verified public repository is https://github.com/akilcodes-7/Odoo-Makeathon. The team handoff uses lowercase `dev`, explicitly confirmed by the user at 12:02 IST. It was fetched at `32f797d` immediately before the documentation handoff. The earlier fresh clone used published snapshot `c9638c8`. The remote default branch is `plan-submission-17140653490169652980` and was not modified. The local `main` branch remains unchanged.
 
 The owner should follow the participant's two-handle instruction unless the portal says otherwise, and record the actual permission level required by the organizer. Do not treat “only the leader can edit the problem statement” as proof that only the leader can submit; verify the submission control itself. Distinguish collaborator invitation sent from invitation accepted/access active. Record both when available.
 
@@ -43,7 +43,7 @@ Recording length/platform are not specified by the supplied rules. Check the por
 | `hapt-odoo` invitation/access status and time | Pending |
 | `hackathon-odoo` invitation/access status and time | Pending |
 | Required collaborator permission level | Pending portal instruction |
-| Last verified published baseline | Implementation commit `0b436d9` and documentation commits through `c9638c8` integrated on `dev`; task branch and `dev` last read-verified at `c9638c8`. Fresh-clone setup/full-suite verification passed at 11:32 IST. |
+| Last verified published baseline | Implementation `0b436d9`, documentation through `32f797d`; remote `dev` fetched at `32f797d` before the 12:02 IST documentation-only team handoff. Audit reproduced ten functional defects; repairs/UI remain planned. Fresh-clone verification at 11:32 IST remains historical evidence for its tested cases. |
 | Video URL and playback/access check | Pending |
 | Video submission time and receipt | Pending |
 
