@@ -54,5 +54,12 @@ Role: solo morning spine; afternoon reviews/integration/shared code. Branch targ
 - **Push/read-back:** Pushed `codex/remaining-core` and `dev`; `git ls-remote --symref` confirmed both point to `cee28fb908ea88e96f3500ffaab172f32d20fa64`. Default branch remained `plan-submission-17140653490169652980` at `ca69b4b330e75d4070b92376993df74b2200c5db`.
 - **Remaining:** Commit the current docs-only remote status update; verify final refs/clean tree. No code changes after the documented test run. Responsive screenshot and external portal/video checks remain pending.
 
+## 2026-10-31 11:32 IST — Fresh clone verification
+
+- **Setup:** Cloned pushed `dev` to `/tmp/brightloop-fresh-clone`, used the workspace Python 3.12.14 interpreter, installed requirements, migrated a new SQLite DB, and ran `seed_demo` twice (3 created, then 0 duplicates).
+- **Checks:** Fresh clone `manage.py check`, migration drift check, and full tests passed (96 passed, 3 skipped on in-memory SQLite). The dedicated on-disk concurrency suite had already passed 3 in the integrated checkout.
+- **Issue resolved:** System `python3.12` was absent and the initial package install hit sandbox DNS. Reusing the project Python interpreter and an authorized network retry completed setup. No code changed.
+- **Next:** Commit this docs-only verification, refetch/push the authorized branches, verify default branch unchanged, and remove the temporary clone/scale fixture.
+
 Entry format: IST timestamp; card; what changed/why; files; checks/results; commit/PR; blocker; next owner/action.
 

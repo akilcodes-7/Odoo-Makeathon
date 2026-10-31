@@ -58,11 +58,11 @@ python manage.py runserver
 
 To create a repeat-safe local benchmark dataset, run `python manage.py seed_scale --subscriptions 5000` after `seed_demo`, then measure authenticated routes with `python manage.py benchmark_pages --warm-samples 10`. These commands write only to the configured local database. Run the full unit/integration suite with `python manage.py test`; run real concurrent-write checks against a temporary on-disk test DB with `TEST_DATABASE_PATH=/tmp/brightloop-concurrency.sqlite3 python manage.py test tests.test_concurrency`.
 
-**Known limitations:** responsive browser screenshots at 390, 768, and 1440 px have not been captured; the 5,000-record timings measure Django request handling, not full browser rendering or concurrent load. Delivery uses the configured Django email backend; no background scheduler, live payment gateway, refunds, or credit notes are implemented. Portal submission, evaluator access, final Git integration/push, and video submission are tracked separately and remain unverified.
+**Known limitations:** responsive browser screenshots at 390, 768, and 1440 px have not been captured; the 5,000-record timings measure Django request handling, not full browser rendering or concurrent load. Delivery uses the configured Django email backend; no background scheduler, live payment gateway, refunds, or credit notes are implemented. Portal submission, evaluator access, and video submission remain unverified. The pushed task branch and `dev` refs are recorded in the handoff.
 
 ## Evaluation evidence
 
-All completion claims should link to actual commits, PRs, screenshots, or captured check results. Current results and limitations are in [the demo/check record](docs/DEMO_AND_CHECKS.md) and [requirements](docs/REQUIREMENTS.md). Implementation commit `0b436d9` and documentation commit `cee28fb` are on `codex/remaining-core` and `dev`; both branches were pushed and read-verified at `cee28fb`. The remote default branch remains unchanged.
+All completion claims should link to actual commits, PRs, screenshots, or captured check results. Current results and limitations are in [the demo/check record](docs/DEMO_AND_CHECKS.md) and [requirements](docs/REQUIREMENTS.md). Implementation commit `0b436d9` and documentation commits `cee28fb`/`c9638c8` are on `codex/remaining-core` and `dev`; the fresh clone used for setup verification was from the pushed `dev`. The remote default branch remains unchanged.
 
 ## Source material
 

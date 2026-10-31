@@ -23,7 +23,7 @@ Creating local documents does not complete these remote submission steps.
 
 | Area | Minimum meaningful checks | Actual result/evidence |
 | --- | --- | --- |
-| Setup | Fresh install/migrate/seed/run; seed repeat safe | Fresh `/tmp/brightloop-scale.sqlite3` migration passed; `seed_demo` created 3 local accounts; `seed_scale --subscriptions 5000` created 5,000 subscriptions, invoices and lines plus 2,500 payments. Seed repeat is covered by `tests.test_seed_scale`; all local DBs remained outside Git. |
+| Setup | Fresh install/migrate/seed/run; seed repeat safe | Fresh clone of pushed `dev` completed using Python 3.12.14: requirements installed, fresh migration passed, `seed_demo` created 3 local accounts and repeat created 0 duplicates. Full suite passed there (96 tests, 3 in-memory concurrency skips); migration drift check passed. Scale fixture and benchmark evidence below. Clone and DB were temporary and outside Git. |
 | Auth | Case-insensitive email collision; exact password rule; reset flow | `tests.test_auth`: 7 tests passed, including normalized duplicate email, password rule, reset token one-use, and POST+CSRF logout. |
 | Access | Admin-only writes; direct endpoint checks; two-customer isolation | Auth, catalog, team, customer, payment, template and portal access tests pass; portal foreign IDs return 404. Full suite below. |
 | Catalog | Variant pricing, quantities, rates, availability and archive | `tests.test_catalog`: 10 tests passed, including paise conversion, variant-product matching, tax basis points, eligibility and archive behavior. |
@@ -38,7 +38,7 @@ Creating local documents does not complete these remote submission steps.
 | UI | 390/768/1440px, keyboard, focus, reduced motion, useful errors | Local browser rendered customer dashboard at its available 890×921 viewport. CSS/JS implement responsive drawer, Escape/focus handling, 44×44 menu target, and reduced motion. Exact 390/768/1440 screenshots and full keyboard/contrast audit remain unverified. |
 | Offline | Local assets/db/email fallback; no network needed after install | Static styles/scripts are local; Django console email default. Fresh offline install was not tested (dependency packages may require package access). |
 | Performance | 5,000 subscriptions plus related records; server and browser measurements | Backend measurement passed all five routes under 2s; details below. Full browser rendering and concurrent load were not measured. |
-| Git | Each contributor's actual branches, commits, PR reviews | Remote refs read after push: `dev` and `codex/remaining-core` both `cee28fb`; default=`plan-submission-17140653490169652980` unchanged. Implementation commit `0b436d9` and docs commit `cee28fb` use repository-configured author. No PR/review or separate human teammate commits are recorded. |
+| Git | Each contributor's actual branches, commits, PR reviews | Remote refs read after push: `dev` and `codex/remaining-core` both `c9638c8` before the fresh-clone docs follow-up; the follow-up is being recorded separately. Default=`plan-submission-17140653490169652980` unchanged. Implementation commit `0b436d9` and docs commits use repository-configured author. No PR/review or separate human teammate commits are recorded. |
 
 ## Integrated verification — 2026-10-31
 
@@ -49,6 +49,12 @@ Creating local documents does not complete these remote submission steps.
 - `git diff --check`: passed. `node --check static/js/app.js`: passed.
 - `tests.test_subscription_views` (5) and `tests.test_templates` (6): passed after adding visible editable manual quote expiry with a seven-day default and verifying the template validity override.
 - Initial benchmark harness attempts returned HTTP 400 because Django's test client used disallowed host `testserver`; after using allowed `localhost`, `/dashboard/` returned 404 because the dashboard is mounted at `/`. The harness now uses `/`; final successful results follow. These were harness/path errors, not route performance results.
+
+## Fresh clone verification — 2026-10-31 11:32 IST
+
+- Cloned pushed `dev` into `/tmp/brightloop-fresh-clone` and recreated a Python 3.12.14 virtual environment using the workspace interpreter. The system `python3.12` command was unavailable; using the project interpreter resolved that environment mismatch.
+- Initial package installation was blocked by sandbox DNS; the authorized network retry installed the pinned Django 5.2.18 and dependencies. Then `manage.py check`, fresh migrations, `seed_demo` (3 accounts, repeat 0 duplicates), full tests (96 passed, 3 in-memory concurrency skips), and `makemigrations --check --dry-run` all passed.
+- The fresh clone was taken from the pushed `dev` tip before this documentation-only follow-up. No code changes were needed. Temporary clone and database stayed outside the repository.
 
 ## Performance record — 2026-10-31 11:22 IST
 

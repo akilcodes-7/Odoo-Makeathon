@@ -83,6 +83,13 @@ All times are Asia/Kolkata (IST). Planned times are kept in the implementation p
 - **Commits:** Implementation `0b436d9a9495fe99f43b929224301603935a6687`; documentation `cee28fb908ea88e96f3500ffaab172f32d20fa64`. Both use the repository-configured Git identity; no separate teammate identity or review is claimed.
 - **Next:** Record this remote verification in the handoff, commit/push that docs-only update to both authorized branches, and retain remaining visual/external submission limitations.
 
+## 2026-10-31 11:32 IST — Fresh clone setup and test verification
+
+- **Setup:** Cloned the pushed `dev` branch into `/tmp/brightloop-fresh-clone`; using the workspace Python 3.12.14 interpreter, installed `requirements.txt`, migrated a fresh SQLite database, and ran `seed_demo` twice (first created 3 accounts, second created 0 duplicates).
+- **Checks:** Fresh clone `manage.py check`, `makemigrations --check --dry-run`, and full suite passed; 96 tests passed and 3 concurrency tests skipped under the default in-memory test DB. Dedicated on-disk concurrency results remain 3 passed from the integrated checkout. Initial system `python3.12` lookup and sandbox DNS install failed; both were resolved with the existing 3.12 interpreter and authorized network retry.
+- **Scope:** This verifies the pushed `dev` snapshot before the current docs-only update; no implementation files changed. Temporary clone/database remained outside Git.
+- **Next:** Commit the recorded setup evidence, re-fetch and fast-forward only if `dev` remains unchanged, then push task branch and `dev`, read back refs, and clean temporary files.
+
 ## Entry template
 
 Copy this for actual progress; replace all placeholders and remove irrelevant lines:
@@ -118,11 +125,11 @@ Next action and owner:
 
 ## End-of-event record — complete later
 
-- Final commit/repository URL: pending.
-- Implemented requirements and evidence: pending.
-- Unfinished requirements: all build items pending at planning time.
-- Measured performance and environment: pending.
-- Verified demo/setup: pending.
-- Team contributions/PRs: pending.
-- Known limitations and follow-up work: pending.
+- Final implementation commit/repository: `0b436d9` on https://github.com/akilcodes-7/Odoo-Makeathon, integrated into `dev`; docs through `c9638c8` were read-verified, and this fresh-clone follow-up records the separate docs-only push.
+- Implemented requirements and evidence: S0–S5, T1A/B, T2A/B, and T3A/B are implemented; see `docs/REQUIREMENTS.md` and `docs/DEMO_AND_CHECKS.md`.
+- Unfinished requirements: exact 390/768/1440 screenshots and full keyboard/contrast audit; external portal receipt, evaluator invites, and video submission are unverified.
+- Measured performance: five authenticated server-rendered routes under 2 seconds at 5,000 subscriptions with related invoices/lines and payments; environment and per-route results in `docs/DEMO_AND_CHECKS.md`.
+- Verified demo/setup: fresh clone install/migrate/seed repeat/full suite passed; 96 tests passed with 3 in-memory concurrency skips; separate on-disk concurrency checks passed 3.
+- Team contributions/PRs: delegated implementation plus lead integration; repository-configured Git identity used; no separate human teammate commits or PR reviews are claimed.
+- Known limitations: no browser timing, external scheduler, live payment gateway, refunds, credit notes, confirmed email receipt, or external portal/video evidence.
 
