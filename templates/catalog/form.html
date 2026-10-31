@@ -3,22 +3,53 @@
 {% block topbar_context %}Product &amp; plan catalog{% endblock %}
 {% block page_title %}{{ title }}{% endblock %}
 {% block page_description %}<p class="page-description">Catalog values are stored in the database and can be updated by an administrator.</p>{% endblock %}
+
 {% block content %}
-<section class="form-card catalog-form-card" aria-labelledby="catalog-form-heading">
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {% if form.non_field_errors %}<div class="field-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
-    <div class="form-grid">
-      {% for field in form %}
-        <div class="form-field{% if field.errors %} has-error{% endif %}{% if field.field.widget.input_type == 'checkbox' %} catalog-checkbox{% endif %}">
-          {% if field.field.widget.input_type == 'checkbox' %}<label class="check-label">{{ field }} {{ field.label }}</label>{% else %}<label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="required-mark" aria-hidden="true">*</span>{% endif %}</label>{% endif %}
-          {% if field.help_text %}<p class="field-help">{{ field.help_text }}</p>{% endif %}
-          {% if field.field.widget.input_type != 'checkbox' %}{{ field }}{% endif %}
-          {% if field.errors %}<div class="field-errors" role="alert">{% for error in field.errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+<div style="display: flex; justify-content: center; padding: 12px 0 32px;">
+  <section class="card" aria-labelledby="catalog-form-heading" style="width: 100%; max-width: 600px; padding: 32px; border-radius: 18px; box-shadow: var(--shadow-modal);">
+    <form method="post" novalidate data-pending-submit>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="message message--error" role="alert" style="margin-bottom: 20px;">
+          <p>{{ form.non_field_errors.0 }}</p>
         </div>
-      {% endfor %}
-    </div>
-    <div class="form-actions"><a class="button button--secondary" href="{{ cancel_url }}">Cancel</a><button class="button button--primary" type="submit">Save</button></div>
-  </form>
-</section>
+      {% endif %}
+
+      <div class="form-grid" style="display: flex; flex-direction: column; gap: 16px;">
+        {% for field in form %}
+          <div class="form-field{% if field.errors %} has-error{% endif %}{% if field.field.widget.input_type == 'checkbox' %} catalog-checkbox{% endif %}">
+            {% if field.field.widget.input_type == 'checkbox' %}
+              <label class="check-label" style="display: flex; align-items: center; gap: 8px; font-weight: 500; cursor: pointer;">
+                {{ field }} <span>{{ field.label }}</span>
+              </label>
+            {% else %}
+              <label class="field-label" for="{{ field.id_for_label }}">
+                {{ field.label }}{% if field.field.required %}<span class="required-mark" aria-hidden="true" style="color: var(--apple-red); margin-left: 2px;">*</span>{% endif %}
+              </label>
+            {% endif %}
+
+            {% if field.help_text %}
+              <p class="field-help" style="margin: 2px 0 6px; font-size: 12px; color: var(--muted);">{{ field.help_text }}</p>
+            {% endif %}
+
+            {% if field.field.widget.input_type != 'checkbox' %}
+              {{ field }}
+            {% endif %}
+
+            {% if field.errors %}
+              <div class="field-errors" role="alert" style="margin-top: 4px;">
+                {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);">
+        <a class="button button--secondary" href="{{ cancel_url }}">Cancel</a>
+        <button class="button button--primary" type="submit" data-pending-label="Saving…">Save</button>
+      </div>
+    </form>
+  </section>
+</div>
 {% endblock %}

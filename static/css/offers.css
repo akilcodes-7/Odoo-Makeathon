@@ -1,1 +1,66 @@
-.offers-filter{align-items:end;display:grid;gap:12px;grid-template-columns:minmax(220px,1fr) minmax(150px,220px) auto;margin-bottom:16px}.offers-filter .form-field{margin:0}.offers-form-card{max-width:920px}.offers-summary,.offers-redemptions{margin-bottom:20px}.offers-facts{display:grid;gap:18px 28px;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;padding:24px}.offers-facts div{min-width:0}.offers-facts dt{color:var(--muted);font-size:13px;margin-bottom:5px}.offers-facts dd{font-weight:600;margin:0;overflow-wrap:anywhere}.section-heading{padding:20px 20px 0}.section-heading h2{font-size:18px;margin:0 0 6px}.section-heading p{color:var(--muted);margin:0}.status-badge--muted{background:#eef0f4;color:var(--muted)}@media(max-width:767px){.offers-filter{grid-template-columns:1fr}.offers-facts{grid-template-columns:repeat(2,minmax(0,1fr));padding:16px}}
+/* -------------------------------------------------------------------------- */
+/* Offers, Discounts & Quotation Templates                                    */
+/* -------------------------------------------------------------------------- */
+
+.offers-filter {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(160px, 220px) auto;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+.offers-filter .form-field {
+  margin: 0;
+}
+
+.offers-form-card {
+  max-width: 960px;
+  padding: 26px;
+}
+
+.offers-summary,
+.offers-redemptions {
+  margin-bottom: 24px;
+}
+
+.offers-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px 30px;
+  margin: 0;
+  padding: 24px;
+}
+
+.offers-facts div {
+  min-width: 0;
+}
+
+.offers-facts dt {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.offers-facts dd {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.status-badge--muted {
+  background: var(--neutral-soft);
+  color: var(--muted);
+}
+
+@media (max-width: 768px) {
+  .offers-filter {
+    grid-template-columns: 1fr;
+  }
+  .offers-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 16px;
+  }
+}

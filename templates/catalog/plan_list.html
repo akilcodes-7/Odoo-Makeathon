@@ -7,6 +7,16 @@
 {% block page_description %}<p class="page-description">{% if customer_view %}Plans currently available for new subscriptions.{% else %}Recurring prices and contract options.{% endif %}</p>{% endblock %}
 {% block page_actions %}{% if user.role == 'ADMIN' %}<a class="button button--primary" href="{% url 'catalog:plan_create' %}">Add plan</a>{% endif %}{% endblock %}
 {% block content %}
+<nav class="segmented-control" aria-label="Catalog navigation">
+  {% if not customer_view %}
+    <a class="button button--small" href="{% url 'catalog:products' %}">Products</a>
+  {% endif %}
+  <a class="button button--small is-active" href="{% url 'catalog:plans' %}">Plans</a>
+  {% if not customer_view and user.role != 'CUSTOMER' %}
+    <a class="button button--small" href="{% url 'catalog:taxes' %}">Taxes</a>
+  {% endif %}
+</nav>
+
 <form method="get" class="filter-row catalog-search"><div class="form-field"><label class="field-label" for="plan-search">Search plans</label><input id="plan-search" name="q" value="{{ query }}" type="search" placeholder="Plan or product"></div><button class="button button--secondary" type="submit">Search</button></form>
 <section class="table-card" aria-label="Plans"><div class="table-scroll"><table class="data-table"><thead><tr><th>Plan</th><th>Primary product</th><th>Frequency</th><th class="numeric">Unit price</th><th>Availability</th>{% if not customer_view %}<th>Minimum</th><th>Contract options</th><th></th>{% endif %}</tr></thead><tbody>
 {% for plan in page_obj %}<tr><td>{% if not customer_view %}<a class="table-primary" href="{% url 'catalog:plan_detail' plan.pk %}">{{ plan.name }}</a>{% else %}<span class="table-primary">{{ plan.name }}</span>{% endif %}</td><td>{{ plan.primary_product.name }}</td><td>{{ plan.get_period_display }}</td><td class="numeric">{{ plan.price_display }}</td><td>{{ plan.available_from }}{% if plan.available_until %} – {{ plan.available_until }}{% else %} onward{% endif %}</td>{% if not customer_view %}<td>{{ plan.min_quantity }}</td><td>{% if plan.closable %}Close{% endif %}{% if plan.pausable %}{% if plan.closable %}, {% endif %}Pause{% endif %}{% if plan.renewable %}{% if plan.closable or plan.pausable %}, {% endif %}Renew{% endif %}{% if plan.auto_close %}<span class="table-secondary">Auto close</span>{% endif %}</td><td><a href="{% url 'catalog:plan_detail' plan.pk %}">View</a></td>{% endif %}</tr>{% empty %}<tr><td colspan="8"><div class="empty-state"><h2>{% if customer_view %}No plans available{% else %}No plans found{% endif %}</h2><p>{% if customer_view %}There are no active plans available for a new subscription today.{% else %}Add a plan after creating its primary product.{% endif %}</p>{% if user.role == 'ADMIN' %}<a class="button button--primary" href="{% url 'catalog:plan_create' %}">Add plan</a>{% endif %}</div></td></tr>{% endfor %}

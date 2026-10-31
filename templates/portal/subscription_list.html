@@ -1,11 +1,73 @@
 {% extends 'base.html' %}
 {% block title %}My subscriptions{% endblock %}
-{% block topbar_context %}My subscriptions{% endblock %}
+{% block topbar_context %}Customer portal · Subscriptions{% endblock %}
 {% block page_title %}My subscriptions{% endblock %}
-{% block page_description %}<p class="page-description">Your subscription history and current service terms.</p>{% endblock %}
+{% block page_description %}<p class="page-description">Your subscription history, service terms, and renewal controls.</p>{% endblock %}
+
 {% block content %}
-<div class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Reference</th><th>Plan</th><th>Service term</th><th>Status</th><th>Billing</th><th></th></tr></thead><tbody>
-{% for subscription in page_obj %}<tr><td>{{ subscription.number }}</td><td>{{ subscription.plan.name }}</td><td>{{ subscription.start_date }} – {{ subscription.expiry_date }}</td><td>{{ subscription.get_status_display }}{% if subscription.is_paused %}<span class="table-secondary">{% if subscription.pause_effective_on > today %}Pause scheduled {{ subscription.pause_effective_on }}{% else %}Paused{% endif %}</span>{% endif %}</td><td>{{ subscription.get_billing_period_display }}</td><td><a href="{% url 'portal:subscription_detail' subscription.pk %}">Details</a></td></tr>{% empty %}<tr><td colspan="6">You do not have any subscriptions yet.</td></tr>{% endfor %}
-</tbody></table></div></div>
-{% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Subscription pages">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}
+<section class="table-card" aria-label="Customer subscriptions">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Plan</th>
+          <th>Service term</th>
+          <th>Status</th>
+          <th>Billing</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for subscription in page_obj %}
+          <tr>
+            <td style="font-weight: 550;">
+              <a href="{% url 'portal:subscription_detail' subscription.pk %}">{{ subscription.number }}</a>
+            </td>
+            <td>{{ subscription.plan.name }}</td>
+            <td style="font-variant-numeric: tabular-nums;">{{ subscription.start_date }} – {{ subscription.expiry_date }}</td>
+            <td>
+              <span class="status-badge status-badge--{{ subscription.status }}">
+                {{ subscription.get_status_display }}
+              </span>
+              {% if subscription.is_paused %}
+                <span class="table-secondary" style="display: block; font-size: 11px; margin-top: 2px;">
+                  {% if subscription.pause_effective_on > today %}
+                    Pause scheduled {{ subscription.pause_effective_on }}
+                  {% else %}
+                    Paused
+                  {% endif %}
+                </span>
+              {% endif %}
+            </td>
+            <td>{{ subscription.get_billing_period_display }}</td>
+            <td style="text-align: right;">
+              <a class="button button--secondary" href="{% url 'portal:subscription_detail' subscription.pk %}" style="padding: 4px 12px; font-size: 12px;">View</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <h2>No subscriptions yet</h2>
+                <p>You do not have any active or past subscriptions.</p>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+    <nav class="pagination" aria-label="Subscription pages">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      {% endif %}
+      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
 {% endblock %}

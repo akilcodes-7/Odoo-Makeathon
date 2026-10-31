@@ -1,28 +1,64 @@
 :root {
   color-scheme: light;
-  --bg: #f5f6fa;
-  --surface: #fff;
-  --surface-soft: #f8f7fa;
-  --text: #172033;
-  --muted: #526078;
-  --nav: #30243e;
-  --nav-muted: #c9bfd2;
-  --primary: #674574;
-  --primary-hover: #553860;
-  --accent: #0b766e;
-  --accent-soft: #e5f4f1;
-  --border: #dde2eb;
-  --danger: #b42318;
-  --danger-soft: #fff0ed;
-  --warning: #8a4b08;
-  --warning-soft: #fff5df;
-  --success: #146c43;
-  --success-soft: #e9f7ef;
-  --focus: #2563eb;
-  --radius-card: 14px;
-  --radius-control: 8px;
-  --shadow-card: 0 4px 18px rgba(23, 32, 51, .06);
-  --shadow-popover: 0 18px 48px rgba(23, 32, 51, .18);
+
+  /* Apple System Palette */
+  --bg: #f5f5f7;
+  --bg-secondary: #e8e8ed;
+  --surface: #ffffff;
+  --surface-secondary: #fbfbfd;
+  --surface-tertiary: #f2f2f7;
+
+  /* Typography Colors */
+  --text: #1d1d1f;
+  --text-secondary: #515154;
+  --muted: #86868b;
+  --muted-light: #a1a1a6;
+
+  /* Apple Sidebar / Dark Chrome */
+  --sidebar-bg: #1c1c1e;
+  --sidebar-text: #f5f5f7;
+  --sidebar-muted: #98989d;
+  --sidebar-hover: rgba(255, 255, 255, 0.08);
+  --sidebar-active: rgba(255, 255, 255, 0.16);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+
+  /* Apple System Accents */
+  --primary: #0071e3;
+  --primary-hover: #0077ed;
+  --primary-active: #0062c4;
+  --primary-tint: rgba(0, 113, 227, 0.1);
+  --primary-glow: rgba(0, 113, 227, 0.25);
+
+  --accent: #00a299;
+  --accent-soft: rgba(0, 162, 153, 0.1);
+
+  --border: rgba(0, 0, 0, 0.08);
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --border-focus: #0071e3;
+
+  /* Status Colors */
+  --success: #1b7a32;
+  --success-soft: rgba(52, 199, 89, 0.14);
+  --warning: #b25e02;
+  --warning-soft: rgba(255, 149, 0, 0.14);
+  --danger: #d70015;
+  --danger-soft: rgba(255, 59, 48, 0.12);
+  --info: #0071e3;
+  --info-soft: rgba(0, 113, 227, 0.12);
+  --neutral-soft: rgba(142, 142, 147, 0.12);
+
+  /* Geometry & Radii */
+  --radius-card: 16px;
+  --radius-panel: 14px;
+  --radius-control: 10px;
+  --radius-pill: 980px;
+
+  /* Multi-layered Soft Shadows */
+  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.05), 0 16px 36px rgba(0, 0, 0, 0.07);
+  --shadow-popover: 0 18px 48px rgba(0, 0, 0, 0.18), 0 4px 14px rgba(0, 0, 0, 0.06);
+
+  /* Spacing */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -30,5 +66,14 @@
   --space-6: 24px;
   --space-8: 32px;
   --space-12: 48px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Spring Physics & Motion Easing */
+  --spring-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-duration-fast: 140ms;
+  --spring-duration-normal: 240ms;
+
+  /* Typography Stack */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

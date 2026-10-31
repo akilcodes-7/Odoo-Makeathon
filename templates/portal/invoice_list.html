@@ -1,12 +1,75 @@
 {% extends 'base.html' %}
 {% load money %}
 {% block title %}My invoices{% endblock %}
-{% block topbar_context %}My invoices{% endblock %}
+{% block topbar_context %}Customer portal · Invoices{% endblock %}
 {% block page_title %}My invoices{% endblock %}
 {% block page_description %}<p class="page-description">Confirmed and paid invoices for your account.</p>{% endblock %}
+
 {% block content %}
-<div class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Invoice</th><th>Subscription</th><th>Issued</th><th>Due</th><th>Status</th><th class="numeric">Total</th><th class="numeric">Balance</th><th></th></tr></thead><tbody>
-{% for invoice in page_obj %}<tr><td>{{ invoice.number }}</td><td>{{ invoice.subscription.number }}</td><td>{{ invoice.invoice_date }}</td><td>{{ invoice.due_date }}</td><td>{{ invoice.get_status_display }}</td><td class="numeric">{{ invoice.total_paise|money }}</td><td class="numeric">{{ invoice.balance_paise|money }}</td><td><a href="{% url 'portal:invoice_detail' invoice.pk %}">Details</a></td></tr>{% empty %}<tr><td colspan="8">You have no confirmed invoices yet.</td></tr>{% endfor %}
-</tbody></table></div></div>
-{% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Invoice pages">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}
+<section class="table-card" aria-label="Customer invoices">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Invoice</th>
+          <th>Subscription</th>
+          <th>Issued</th>
+          <th>Due</th>
+          <th>Status</th>
+          <th class="numeric" style="text-align: right;">Total</th>
+          <th class="numeric" style="text-align: right;">Balance</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for invoice in page_obj %}
+          <tr>
+            <td style="font-weight: 550;">
+              <a href="{% url 'portal:invoice_detail' invoice.pk %}">{{ invoice.number }}</a>
+            </td>
+            <td>
+              <a href="{% url 'portal:subscription_detail' invoice.subscription.pk %}">{{ invoice.subscription.number }}</a>
+            </td>
+            <td style="font-variant-numeric: tabular-nums;">{{ invoice.invoice_date }}</td>
+            <td style="font-variant-numeric: tabular-nums;">{{ invoice.due_date }}</td>
+            <td>
+              <span class="status-badge status-badge--{{ invoice.status }}">
+                {{ invoice.get_status_display }}
+              </span>
+            </td>
+            <td class="numeric" style="text-align: right; font-weight: 600; font-variant-numeric: tabular-nums;">
+              {{ invoice.total_paise|money }}
+            </td>
+            <td class="numeric" style="text-align: right; font-variant-numeric: tabular-nums; {% if invoice.balance_paise > 0 %}color: var(--apple-orange); font-weight: 600;{% else %}color: var(--muted);{% endif %}">
+              {{ invoice.balance_paise|money }}
+            </td>
+            <td style="text-align: right;">
+              <a class="button button--secondary" href="{% url 'portal:invoice_detail' invoice.pk %}" style="padding: 4px 12px; font-size: 12px;">View</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <h2>No invoices yet</h2>
+                <p>You have no confirmed invoices yet.</p>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+    <nav class="pagination" aria-label="Invoice pages">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      {% endif %}
+      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
 {% endblock %}

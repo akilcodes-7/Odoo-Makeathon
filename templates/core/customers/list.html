@@ -5,8 +5,62 @@
 {% block page_description %}<p class="page-description">Internal customer records and their billing contact details.</p>{% endblock %}
 {% block page_actions %}<a class="button button--primary" href="{% url 'customers:new' %}">Add customer</a>{% endblock %}
 {% block content %}
-<form method="get" class="filter-row"><div class="form-field"><label class="field-label" for="customer-query">Search customers</label><input class="form-control" id="customer-query" type="search" name="q" value="{{ query }}" placeholder="Name or billing email"></div><button class="button button--secondary" type="submit">Search</button></form>
-<section class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Billing email</th><th>Phone</th><th>Status</th><th></th></tr></thead><tbody>
-{% for customer in customers %}<tr><td><a href="{% url 'customers:detail' customer.pk %}">{{ customer.display_name }}</a></td><td>{{ customer.billing_email }}</td><td>{{ customer.phone|default:'—' }}</td><td>{% if customer.is_active %}Active{% else %}Archived{% endif %}</td><td><a href="{% url 'customers:edit' customer.pk %}">Edit</a></td></tr>{% empty %}<tr><td colspan="5"><div class="empty-state"><h2>No customers found</h2><p>Add a customer to create a subscription offer.</p><a class="button button--primary" href="{% url 'customers:new' %}">Add customer</a></div></td></tr>{% endfor %}
-</tbody></table></div>{% include 'components/table_pagination.html' with page_obj=page_obj query_string=query_string %}</section>
+<form method="get" class="filter-row" style="margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-end;">
+  <div class="form-field" style="flex: 1; max-width: 400px; margin: 0;">
+    <label class="field-label" for="customer-query">Search customers</label>
+    <input class="form-control" id="customer-query" type="search" name="q" value="{{ query }}" placeholder="Name or billing email">
+  </div>
+  <button class="button button--secondary" type="submit">Search</button>
+  {% if query %}
+    <a class="button button--ghost" href="{% url 'customers:list' %}">Clear</a>
+  {% endif %}
+</form>
+
+<section class="table-card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Billing email</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for customer in customers %}
+          <tr>
+            <td style="font-weight: 550;">
+              <a href="{% url 'customers:detail' customer.pk %}">{{ customer.display_name }}</a>
+            </td>
+            <td>{{ customer.billing_email }}</td>
+            <td style="color: var(--muted);">{{ customer.phone|default:'—' }}</td>
+            <td>
+              {% if customer.is_active %}
+                <span class="status-badge status-badge--success">Active</span>
+              {% else %}
+                <span class="status-badge status-badge--neutral">Archived</span>
+              {% endif %}
+            </td>
+            <td style="text-align: right;">
+              <a class="button button--ghost" href="{% url 'customers:edit' customer.pk %}" style="padding: 4px 10px; font-size: 12px;">Edit</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <h2>No customers found</h2>
+                <p>Add a customer to create a subscription offer.</p>
+                <a class="button button--primary" href="{% url 'customers:new' %}">Add customer</a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'components/table_pagination.html' with page_obj=page_obj query_string=query_string %}
+</section>
 {% endblock %}

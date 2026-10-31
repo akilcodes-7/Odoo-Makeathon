@@ -4,8 +4,81 @@
 {% block topbar_context %}Billing and invoices{% endblock %}
 {% block page_title %}Invoices{% endblock %}
 {% block page_description %}<p class="page-description">Billing periods, saved amounts, and payment balances.</p>{% endblock %}
-{% block page_actions %}<form method="post" action="{% url 'billing:run' %}">{% csrf_token %}<button class="button button--secondary" type="submit">Run billing</button></form>{% endblock %}
+{% block page_actions %}
+  <form method="post" action="{% url 'billing:run' %}">
+    {% csrf_token %}
+    <button class="button button--primary" type="submit">Run billing</button>
+  </form>
+{% endblock %}
 {% block content %}
-<form method="get" class="filter-row"><div class="form-field"><label class="field-label" for="invoice-query">Search</label><input class="form-control" id="invoice-query" type="search" name="q" value="{{ query }}" placeholder="Invoice number or customer"></div><div class="form-field"><label class="field-label" for="invoice-status">Status</label><select class="form-control" id="invoice-status" name="status"><option value="">All statuses</option>{% for value,label in statuses %}<option value="{{ value }}"{% if status == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><button class="button button--secondary" type="submit">Filter</button></form>
-<section class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Invoice</th><th>Customer</th><th>Issue / due</th><th>Status</th><th class="numeric">Total</th><th class="numeric">Balance</th></tr></thead><tbody>{% for invoice in page_obj %}<tr><td><a class="table-primary" href="{% url 'finance:invoice_detail' invoice.pk %}">{{ invoice.number }}</a><span class="table-secondary">{{ invoice.period_start }} – {{ invoice.period_end }} (end exclusive)</span></td><td>{{ invoice.customer_name }}</td><td>{{ invoice.invoice_date }} / {{ invoice.due_date }}</td><td>{{ invoice.get_status_display }}{% if invoice.is_overdue %}<span class="table-secondary">Overdue</span>{% endif %}</td><td class="numeric">{{ invoice.total_paise|money }}</td><td class="numeric">{{ invoice.balance_paise|money }}</td></tr>{% empty %}<tr><td colspan="6"><div class="empty-state"><h2>No invoices yet</h2><p>Run billing when an active contract has a due period.</p></div></td></tr>{% endfor %}</tbody></table></div>{% include 'components/table_pagination.html' with page_obj=page_obj query_string=query_string %}</section>
+<form method="get" class="filter-row">
+  <div class="form-field">
+    <label class="field-label" for="invoice-query">Search</label>
+    <input class="form-control" id="invoice-query" type="search" name="q" value="{{ query }}" placeholder="Invoice number or customer">
+  </div>
+  <div class="form-field">
+    <label class="field-label" for="invoice-status">Status</label>
+    <select class="form-control" id="invoice-status" name="status">
+      <option value="">All statuses</option>
+      {% for value,label in statuses %}
+        <option value="{{ value }}"{% if status == value %} selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button class="button button--secondary" type="submit">Filter</button>
+</form>
+
+<section class="table-card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Invoice</th>
+          <th>Customer</th>
+          <th>Issue / Due</th>
+          <th>Status</th>
+          <th class="numeric">Total</th>
+          <th class="numeric">Balance</th>
+          <th class="numeric">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for invoice in page_obj %}
+          <tr>
+            <td>
+              <a class="table-primary" href="{% url 'finance:invoice_detail' invoice.pk %}">{{ invoice.number }}</a>
+              <span class="table-secondary">{{ invoice.period_start }} – {{ invoice.period_end }}</span>
+            </td>
+            <td>{{ invoice.customer_name }}</td>
+            <td>{{ invoice.invoice_date }} <span class="table-secondary">Due: {{ invoice.due_date }}</span></td>
+            <td>
+              <span class="status-badge {% if invoice.status == 'PAID' %}status-badge--success{% elif invoice.status == 'CONFIRMED' %}status-badge--info{% elif invoice.status == 'DRAFT' %}status-badge--warning{% else %}status-badge--danger{% endif %}">
+                {{ invoice.get_status_display }}
+              </span>
+              {% if invoice.is_overdue %}
+                <span class="status-badge status-badge--danger" style="margin-left: 4px; font-size: 10px; padding: 2px 6px;">Overdue</span>
+              {% endif %}
+            </td>
+            <td class="numeric">{{ invoice.total_paise|money }}</td>
+            <td class="numeric"><strong>{{ invoice.balance_paise|money }}</strong></td>
+            <td class="numeric">
+              <a class="button button--secondary button--small" href="{% url 'finance:invoice_detail' invoice.pk %}">View</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7">
+              <div class="empty-state">
+                <div class="empty-state-icon">🧾</div>
+                <h2>No invoices yet</h2>
+                <p>Run billing when an active contract has a due period.</p>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'components/table_pagination.html' with page_obj=page_obj query_string=query_string %}
+</section>
 {% endblock %}

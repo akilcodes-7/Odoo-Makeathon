@@ -1,19 +1,92 @@
 {% extends 'base.html' %}
 {% load money %}
 {% block title %}Your account{% endblock %}
-{% block topbar_context %}Your account{% endblock %}
-{% block page_title %}Welcome to your account{% endblock %}
-{% block page_description %}<p class="page-description">A private summary of your Brightloop subscriptions and invoices.</p>{% endblock %}
+{% block topbar_context %}Customer portal{% endblock %}
+{% block page_title %}Account overview{% endblock %}
+{% block page_description %}<p class="page-description">A private summary of your Brightloop active subscriptions and billing records.</p>{% endblock %}
 {% block content %}
 <section class="metric-grid" aria-label="Your account summary">
-  <article class="metric-card"><span class="metric-label">Active subscriptions</span><strong class="metric-value">{{ active_count }}</strong></article>
-  <article class="metric-card"><span class="metric-label">Your subscriptions</span><strong class="metric-value">{{ subscription_count }}</strong></article>
-  <article class="metric-card"><span class="metric-label">Invoices</span><strong class="metric-value">{{ invoice_count }}</strong></article>
-  <article class="metric-card"><span class="metric-label">Outstanding</span><strong class="metric-value">{{ outstanding_paise|money }}</strong></article>
+  <article class="metric-card">
+    <span class="metric-label">Active subscriptions</span>
+    <strong class="metric-value">{{ active_count }}</strong>
+    <span class="metric-note">Currently active services</span>
+  </article>
+  <article class="metric-card">
+    <span class="metric-label">Total contracts</span>
+    <strong class="metric-value">{{ subscription_count }}</strong>
+    <span class="metric-note">Lifetime agreements</span>
+  </article>
+  <article class="metric-card">
+    <span class="metric-label">Confirmed invoices</span>
+    <strong class="metric-value">{{ invoice_count }}</strong>
+    <span class="metric-note">Issued to date</span>
+  </article>
+  <article class="metric-card">
+    <span class="metric-label">Outstanding balance</span>
+    <strong class="metric-value" style="color: {% if outstanding_paise > 0 %}var(--danger){% else %}var(--success){% endif %};">{{ outstanding_paise|money }}</strong>
+    <span class="metric-note">Total payable</span>
+  </article>
 </section>
-{% if next_subscription %}<section class="section-heading"><div><h2>Next billing date</h2><p><a href="{% url 'portal:subscription_detail' next_subscription.pk %}">{{ next_subscription.number }}</a> · {{ next_subscription.next_invoice_date }}</p></div></section>{% endif %}
-<section class="section-heading"><div><h2>Recent invoices</h2><p>Only confirmed and paid invoices appear here.</p></div><a class="button button--secondary button--small" href="{% url 'portal:invoices' %}">All invoices</a></section>
-<div class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Invoice</th><th>Subscription</th><th>Date</th><th>Status</th><th class="numeric">Total</th><th></th></tr></thead><tbody>
-{% for invoice in recent_invoices %}<tr><td>{{ invoice.number }}</td><td>{{ invoice.subscription.number }}</td><td>{{ invoice.invoice_date }}</td><td>{{ invoice.get_status_display }}</td><td class="numeric">{{ invoice.total_paise|money }}</td><td><a href="{% url 'portal:invoice_detail' invoice.pk %}">View</a></td></tr>{% empty %}<tr><td colspan="6">You have no confirmed invoices yet.</td></tr>{% endfor %}
-</tbody></table></div></div>
+
+{% if next_subscription %}
+  <section class="card" style="margin-top: 24px; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(0, 113, 227, 0.04), rgba(0, 162, 153, 0.06)); border-color: rgba(0, 113, 227, 0.15);">
+    <div>
+      <span class="page-eyebrow" style="color: var(--primary);">Upcoming billing</span>
+      <h3 style="margin: 4px 0 2px; font-size: 16px; font-weight: 650;">{{ next_subscription.plan.name }}</h3>
+      <p style="margin: 0; color: var(--muted); font-size: 13px;">Next invoice scheduled for <strong>{{ next_subscription.next_invoice_date }}</strong></p>
+    </div>
+    <a class="button button--secondary button--small" href="{% url 'portal:subscription_detail' next_subscription.pk %}">View {{ next_subscription.number }}</a>
+  </section>
+{% endif %}
+
+<section class="section-heading">
+  <div>
+    <h2>Recent invoices</h2>
+    <p>Only confirmed and paid invoices appear here.</p>
+  </div>
+  <a class="button button--secondary button--small" href="{% url 'portal:invoices' %}">All invoices</a>
+</section>
+
+<div class="table-card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Invoice</th>
+          <th>Subscription</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th class="numeric">Total</th>
+          <th class="numeric">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for invoice in recent_invoices %}
+          <tr>
+            <td><a class="table-primary" href="{% url 'portal:invoice_detail' invoice.pk %}">{{ invoice.number }}</a></td>
+            <td>{{ invoice.subscription.number }}</td>
+            <td>{{ invoice.invoice_date }}</td>
+            <td>
+              <span class="status-badge {% if invoice.status == 'PAID' %}status-badge--success{% else %}status-badge--info{% endif %}">
+                {{ invoice.get_status_display }}
+              </span>
+            </td>
+            <td class="numeric">{{ invoice.total_paise|money }}</td>
+            <td class="numeric"><a class="button button--secondary button--small" href="{% url 'portal:invoice_detail' invoice.pk %}">View</a></td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="empty-state-icon">🧾</div>
+                <h2>No invoices yet</h2>
+                <p>You have no confirmed or paid invoices for your account.</p>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

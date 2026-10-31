@@ -3,12 +3,178 @@
 {% block title %}{{ invoice.number }}{% endblock %}
 {% block topbar_context %}Invoice detail{% endblock %}
 {% block page_title %}{{ invoice.number }}{% endblock %}
-{% block page_description %}<p class="page-description">{{ invoice.customer_name }} · {{ invoice.get_status_display }}{% if invoice.is_overdue %} · Overdue{% endif %}</p>{% endblock %}
-{% block page_actions %}{% if invoice.status == 'CONFIRMED' or invoice.status == 'PAID' %}<a class="button button--secondary" href="{% url 'finance_delivery:print' invoice.pk %}">Print</a>{% endif %}{% endblock %}
+{% block page_description %}
+  <p class="page-description">
+    {{ invoice.customer_name }} ·
+    <span class="status-badge {% if invoice.status == 'PAID' %}status-badge--success{% elif invoice.status == 'CONFIRMED' %}status-badge--info{% elif invoice.status == 'DRAFT' %}status-badge--warning{% else %}status-badge--danger{% endif %}">
+      {{ invoice.get_status_display }}
+    </span>
+    {% if invoice.is_overdue %}
+      <span class="status-badge status-badge--danger" style="margin-left: 4px; font-size: 10px; padding: 2px 6px;">Overdue</span>
+    {% endif %}
+  </p>
+{% endblock %}
+{% block page_actions %}
+  {% if invoice.status == 'CONFIRMED' or invoice.status == 'PAID' %}
+    <a class="button button--secondary" href="{% url 'finance_delivery:print' invoice.pk %}">Print</a>
+  {% endif %}
+{% endblock %}
 {% block content %}
-<section class="content-grid"><article class="card"><h2>Saved billing identity</h2><p><strong>{{ invoice.customer_name }}</strong></p><p>{{ invoice.customer_email }}</p><p>{{ invoice.customer_address|linebreaksbr|default:'—' }}</p><dl class="detail-list"><dt>Subscription</dt><dd><a href="{% url 'subscriptions:detail' invoice.subscription_id %}">{{ invoice.subscription.number }}</a></dd><dt>Period</dt><dd>{{ invoice.period_start }} – {{ invoice.period_end }} (end exclusive)</dd><dt>Issued / due</dt><dd>{{ invoice.invoice_date }} / {{ invoice.due_date }}</dd><dt>Terms snapshot</dt><dd>{{ invoice.terms_days_snapshot }} days</dd></dl></article>
-<article class="card"><h2>Totals</h2><dl class="detail-list"><dt>Subtotal</dt><dd>{{ invoice.subtotal_paise|money }}</dd><dt>Discount</dt><dd>−{{ invoice.discount_paise|money }}{% if invoice.discount_redemption %} · {{ invoice.discount_redemption.discount_name }}{% endif %}</dd><dt>Tax</dt><dd>{{ invoice.tax_paise|money }}</dd><dt>Total</dt><dd><strong>{{ invoice.total_paise|money }}</strong></dd><dt>Paid</dt><dd>{{ invoice.paid_paise|default:0|money }}</dd><dt>Balance due</dt><dd><strong>{{ invoice.balance_paise|money }}</strong></dd></dl></article></section>
-<section class="section-heading"><div><h2>Invoice lines</h2><p>Amounts below are immutable saved snapshots.</p></div></section><section class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Description</th><th>Quantity</th><th>Service days</th><th class="numeric">Subtotal</th><th class="numeric">Discount</th><th class="numeric">Tax</th><th class="numeric">Total</th></tr></thead><tbody>{% for line in invoice.lines.all %}<tr><td>{{ line.product_name }}{% if line.variant_description %}<span class="table-secondary">{{ line.variant_description }}</span>{% endif %}</td><td>{{ line.quantity }}</td><td>{{ line.period_numerator_days }} / {{ line.period_denominator_days }}</td><td class="numeric">{{ line.subtotal_paise|money }}</td><td class="numeric">−{{ line.discount_paise|money }}</td><td class="numeric">{{ line.tax_paise|money }}</td><td class="numeric">{{ line.total_paise|money }}</td></tr>{% empty %}<tr><td colspan="7">No saved invoice lines.</td></tr>{% endfor %}</tbody></table></div></section>
-<section class="section-heading"><div><h2>Payments</h2><p>Immutable payment records allocated to this invoice.</p></div><div>{% if invoice.status == 'CONFIRMED' and invoice.balance_paise > 0 %}<a class="button button--primary" href="{% url 'finance_payments:new' invoice.pk %}">Record payment</a>{% endif %}</div></section><section class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Date</th><th>Method</th><th>Note</th><th class="numeric">Amount</th></tr></thead><tbody>{% for payment in invoice.payments.all %}<tr><td>{{ payment.paid_on }}</td><td>{{ payment.get_method_display }}</td><td>{{ payment.note|default:'—' }}</td><td class="numeric">{{ payment.amount_paise|money }}</td></tr>{% empty %}<tr><td colspan="4">No payments recorded.</td></tr>{% endfor %}</tbody></table></div></section>
-<section class="section-heading"><div><h2>Invoice actions</h2><p>Only lifecycle-approved changes are available for this state.</p></div></section><div class="action-row">{% if invoice.status == 'DRAFT' %}<form method="post" action="{% url 'finance:invoice_action' invoice.pk 'confirm' %}">{% csrf_token %}<button class="button button--primary" type="submit">Confirm invoice</button></form>{% endif %}{% if invoice.status == 'DRAFT' or invoice.status == 'CONFIRMED' %}<form method="post" action="{% url 'finance:invoice_action' invoice.pk 'cancel' %}">{% csrf_token %}<button class="button button--secondary" type="submit">Cancel invoice</button></form>{% endif %}{% if invoice.status == 'CONFIRMED' or invoice.status == 'PAID' %}<form method="post" action="{% url 'finance_delivery:send' invoice.pk %}">{% csrf_token %}<button class="button button--secondary" type="submit">Send invoice email</button></form>{% endif %}</div>
+<section class="content-grid">
+  <article class="card">
+    <h2>Saved billing identity</h2>
+    <p style="font-size: 15px; font-weight: 650; margin: 0 0 4px;">{{ invoice.customer_name }}</p>
+    <p style="color: var(--muted); margin: 0 0 10px;">{{ invoice.customer_email }}</p>
+    <p style="color: var(--muted); font-size: 13px; margin: 0 0 16px;">{{ invoice.customer_address|linebreaksbr|default:'—' }}</p>
+    <dl class="detail-list">
+      <dt>Subscription</dt>
+      <dd><a href="{% url 'subscriptions:detail' invoice.subscription_id %}">{{ invoice.subscription.number }}</a></dd>
+      <dt>Period</dt>
+      <dd>{{ invoice.period_start }} – {{ invoice.period_end }}</dd>
+      <dt>Issued / Due</dt>
+      <dd>{{ invoice.invoice_date }} <span class="table-secondary">Due: {{ invoice.due_date }}</span></dd>
+      <dt>Terms snapshot</dt>
+      <dd>{{ invoice.terms_days_snapshot }} days</dd>
+    </dl>
+  </article>
+
+  <article class="card">
+    <h2>Totals summary</h2>
+    <dl class="detail-list">
+      <dt>Subtotal</dt>
+      <dd class="numeric">{{ invoice.subtotal_paise|money }}</dd>
+      <dt>Discount</dt>
+      <dd class="numeric">−{{ invoice.discount_paise|money }}{% if invoice.discount_redemption %} <span class="table-secondary">({{ invoice.discount_redemption.discount_name }})</span>{% endif %}</dd>
+      <dt>Tax</dt>
+      <dd class="numeric">{{ invoice.tax_paise|money }}</dd>
+      <dt>Total</dt>
+      <dd class="numeric" style="font-size: 16px;"><strong>{{ invoice.total_paise|money }}</strong></dd>
+      <dt>Paid</dt>
+      <dd class="numeric">{{ invoice.paid_paise|default:0|money }}</dd>
+      <dt>Balance due</dt>
+      <dd class="numeric" style="font-size: 16px; color: {% if invoice.balance_paise > 0 %}var(--danger){% else %}var(--success){% endif %};">
+        <strong>{{ invoice.balance_paise|money }}</strong>
+      </dd>
+    </dl>
+  </article>
+</section>
+
+<section class="section-heading">
+  <div>
+    <h2>Invoice lines</h2>
+    <p>Amounts below are immutable saved snapshots.</p>
+  </div>
+</section>
+
+<section class="table-card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Service days</th>
+          <th class="numeric">Subtotal</th>
+          <th class="numeric">Discount</th>
+          <th class="numeric">Tax</th>
+          <th class="numeric">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in invoice.lines.all %}
+          <tr>
+            <td>
+              <span class="table-primary">{{ line.product_name }}</span>
+              {% if line.variant_description %}
+                <span class="table-secondary">{{ line.variant_description }}</span>
+              {% endif %}
+            </td>
+            <td>{{ line.quantity }}</td>
+            <td>{{ line.period_numerator_days }} / {{ line.period_denominator_days }}</td>
+            <td class="numeric">{{ line.subtotal_paise|money }}</td>
+            <td class="numeric">−{{ line.discount_paise|money }}</td>
+            <td class="numeric">{{ line.tax_paise|money }}</td>
+            <td class="numeric"><strong>{{ line.total_paise|money }}</strong></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7">No saved invoice lines.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section-heading">
+  <div>
+    <h2>Payments</h2>
+    <p>Immutable payment records allocated to this invoice.</p>
+  </div>
+  <div>
+    {% if invoice.status == 'CONFIRMED' and invoice.balance_paise > 0 %}
+      <a class="button button--primary" href="{% url 'finance_payments:new' invoice.pk %}">Record payment</a>
+    {% endif %}
+  </div>
+</section>
+
+<section class="table-card">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Method</th>
+          <th>Note</th>
+          <th class="numeric">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in invoice.payments.all %}
+          <tr>
+            <td>{{ payment.paid_on }}</td>
+            <td><span class="status-badge status-badge--neutral">{{ payment.get_method_display }}</span></td>
+            <td>{{ payment.note|default:'—' }}</td>
+            <td class="numeric"><strong>{{ payment.amount_paise|money }}</strong></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4">No payments recorded.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section-heading">
+  <div>
+    <h2>Invoice actions</h2>
+    <p>Only lifecycle-approved changes are available for this state.</p>
+  </div>
+</section>
+
+<div class="action-row">
+  {% if invoice.status == 'DRAFT' %}
+    <form method="post" action="{% url 'finance:invoice_action' invoice.pk 'confirm' %}">
+      {% csrf_token %}
+      <button class="button button--primary" type="submit">Confirm invoice</button>
+    </form>
+  {% endif %}
+
+  {% if invoice.status == 'DRAFT' or invoice.status == 'CONFIRMED' %}
+    <form method="post" action="{% url 'finance:invoice_action' invoice.pk 'cancel' %}">
+      {% csrf_token %}
+      <button class="button button--secondary" type="submit"
+              data-confirm="Cancelling this invoice cannot be undone. If it has payments, cancellation will be rejected."
+              data-confirm-title="Cancel this invoice?"
+              data-confirm-accept="Cancel invoice">
+        Cancel invoice
+      </button>
+    </form>
+  {% endif %}
+
+  {% if invoice.status == 'CONFIRMED' or invoice.status == 'PAID' %}
+    <form method="post" action="{% url 'finance_delivery:send' invoice.pk %}">
+      {% csrf_token %}
+      <button class="button button--secondary" type="submit">Send invoice email</button>
+    </form>
+  {% endif %}
+</div>
 {% endblock %}

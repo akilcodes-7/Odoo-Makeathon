@@ -7,6 +7,14 @@
 {% block page_description %}<p class="page-description">Manage products, variants and internal pricing.</p>{% endblock %}
 {% block page_actions %}{% if user.role == 'ADMIN' %}<a class="button button--primary" href="{% url 'catalog:product_create' %}">Add product</a>{% endif %}{% endblock %}
 {% block content %}
+<nav class="segmented-control" aria-label="Catalog navigation">
+  <a class="button button--small is-active" href="{% url 'catalog:products' %}">Products</a>
+  <a class="button button--small" href="{% url 'catalog:plans' %}">Plans</a>
+  {% if user.role != 'CUSTOMER' %}
+    <a class="button button--small" href="{% url 'catalog:taxes' %}">Taxes</a>
+  {% endif %}
+</nav>
+
 <form method="get" class="filter-row catalog-search"><div class="form-field"><label class="field-label" for="catalog-search">Search products</label><input id="catalog-search" name="q" value="{{ query }}" type="search" placeholder="Name or notes"></div><button class="button button--secondary" type="submit">Search</button></form>
 <section class="table-card" aria-label="Products"><div class="table-scroll"><table class="data-table"><thead><tr><th>Product</th><th>Type</th><th>Variants</th><th class="numeric">Sales price</th><th class="numeric">Cost price</th><th></th></tr></thead><tbody>
 {% for product in page_obj %}<tr><td><a class="table-primary" href="{% url 'catalog:product_detail' product.pk %}">{{ product.name }}</a></td><td>{{ product.get_type_display }}</td><td>{{ product.variants.all|length }}</td><td class="numeric">{{ product.sales_price_display }}</td><td class="numeric">{{ product.cost_price_display }}</td><td><a href="{% url 'catalog:product_detail' product.pk %}">View</a></td></tr>{% empty %}<tr><td colspan="6"><div class="empty-state"><h2>No products found</h2><p>Add products to make them available for plans and subscriptions.</p>{% if user.role == 'ADMIN' %}<a class="button button--primary" href="{% url 'catalog:product_create' %}">Add product</a>{% endif %}</div></td></tr>{% endfor %}

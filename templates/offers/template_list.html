@@ -1,10 +1,81 @@
 {% extends "base.html" %}
-{% block title %}Quotation templates · Brightloop{% endblock %}
+{% load static %}
+{% block title %}Quotation templates{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/offers.css' %}">{% endblock %}
+{% block topbar_context %}Offers &amp; discounts · Templates{% endblock %}
+{% block page_title %}Quotation templates{% endblock %}
+{% block page_description %}<p class="page-description">Reusable quotation starting points with preset lines and terms. Issued quotations retain independent line prices.</p>{% endblock %}
+{% block page_actions %}
+  {% if user.role == "ADMIN" %}
+    <a class="button button--primary" href="{% url 'offers:template_create' %}">New template</a>
+  {% endif %}
+{% endblock %}
+
 {% block content %}
-<div class="page-header"><div><p class="eyebrow">Offers</p><h1>Quotation templates</h1><p>Reusable starting points; issued quotations keep independent line prices.</p></div>{% if user.role == "ADMIN" %}<a class="button button--primary" href="{% url 'offers:template_create' %}">New template</a>{% endif %}</div>
-<section class="panel table-wrap"><table><thead><tr><th>Name</th><th>Plan</th><th>Validity</th><th>Lines</th><th>Status</th><th></th></tr></thead><tbody>
-{% for template in page_obj %}<tr><td><a href="{% url 'offers:template_detail' template.pk %}">{{ template.name }}</a></td><td>{{ template.plan.name }}</td><td>{{ template.validity_days }} days</td><td>{{ template.lines.count }}</td><td>{% if template.is_active %}Active{% else %}Archived{% endif %}</td><td><a href="{% url 'offers:template_detail' template.pk %}">View</a></td></tr>
-{% empty %}<tr><td colspan="6" class="empty-state">No quotation templates are configured.</td></tr>{% endfor %}
-</tbody></table></section>
-{% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Pagination">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}
+<div class="segmented-control" role="tablist" aria-label="Offers section" style="margin-bottom: 20px;">
+  <a href="{% url 'offers:discounts' %}" class="segmented-control__item" role="tab" aria-selected="false">Discounts</a>
+  <a href="{% url 'offers:template_list' %}" class="segmented-control__item is-active" role="tab" aria-selected="true">Quotation templates</a>
+</div>
+
+<section class="table-card" aria-label="Quotation templates">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Plan</th>
+          <th>Validity</th>
+          <th>Lines</th>
+          <th>Status</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for template in page_obj %}
+          <tr>
+            <td style="font-weight: 550;">
+              <a href="{% url 'offers:template_detail' template.pk %}">{{ template.name }}</a>
+            </td>
+            <td>{{ template.plan.name }}</td>
+            <td style="font-variant-numeric: tabular-nums;">{{ template.validity_days }} days</td>
+            <td style="font-variant-numeric: tabular-nums;">{{ template.lines.count }}</td>
+            <td>
+              {% if template.is_active %}
+                <span class="status-badge status-badge--success">Active</span>
+              {% else %}
+                <span class="status-badge status-badge--neutral">Archived</span>
+              {% endif %}
+            </td>
+            <td style="text-align: right;">
+              <a class="button button--ghost" href="{% url 'offers:template_detail' template.pk %}" style="padding: 4px 10px; font-size: 12px;">View</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <h2>No quotation templates configured</h2>
+                <p>Create templates to speed up creating customer subscription offers.</p>
+                {% if user.role == "ADMIN" %}
+                  <a class="button button--primary" href="{% url 'offers:template_create' %}">New template</a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+    <nav class="pagination" aria-label="Pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+      {% endif %}
+      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>
 {% endblock %}

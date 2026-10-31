@@ -2,6 +2,46 @@
 {% block title %}Team{% endblock %}
 {% block topbar_context %}Team access{% endblock %}
 {% block page_title %}Team{% endblock %}
-{% block page_description %}<p class="page-description">Manage Brightloop staff accounts.</p>{% endblock %}
+{% block page_description %}<p class="page-description">Manage Brightloop staff accounts and operational roles.</p>{% endblock %}
 {% block page_actions %}<a class="button button--primary" href="{% url 'team:new' %}">Add staff member</a>{% endblock %}
-{% block content %}<section class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Account</th></tr></thead><tbody>{% for member in staff %}<tr><td>{{ member.get_full_name|default:'—' }}</td><td>{{ member.email }}</td><td>{% if member.is_active %}Active{% else %}Inactive{% endif %}</td></tr>{% empty %}<tr><td colspan="3"><div class="empty-state"><h2>No staff accounts yet</h2><p>Create a staff login to give a teammate access to the workspace.</p></div></td></tr>{% endfor %}</tbody></table></div></section>{% endblock %}
+
+{% block content %}
+<section class="table-card" aria-label="Staff accounts">
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th style="text-align: right;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for member in staff %}
+          <tr>
+            <td style="font-weight: 550;">{{ member.get_full_name|default:'—' }}</td>
+            <td>{{ member.email }}</td>
+            <td style="text-align: right;">
+              {% if member.is_active %}
+                <span class="status-badge status-badge--success">Active</span>
+              {% else %}
+                <span class="status-badge status-badge--neutral">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="3">
+              <div class="empty-state">
+                <h2>No staff accounts yet</h2>
+                <p>Create a staff login to give a teammate access to the workspace.</p>
+                <a class="button button--primary" href="{% url 'team:new' %}">Add staff member</a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,11 +1,64 @@
 {% extends 'base.html' %}
 {% block title %}{{ page_title }}{% endblock %}
-{% block topbar_context %}Subscriptions{% endblock %}
+{% block topbar_context %}Subscriptions · Editor{% endblock %}
 {% block page_title %}{{ page_title }}{% endblock %}
-{% block page_description %}<p class="page-description">Set the customer, contract dates and recurring line prices. Prices are shown in rupees and stored in paise.</p>{% endblock %}
+{% block page_description %}<p class="page-description">Configure the customer, term dates, and line items. Unit prices are entered in rupees and preserved in integer paise.</p>{% endblock %}
+
 {% block content %}
-<section class="form-card"><form method="post" novalidate>{% csrf_token %}{% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}{% for field in form %}{% include 'components/field.html' with field=field %}{% endfor %}
-<h2 class="section-title">Subscription lines</h2>{{ formset.management_form }}{% if formset.non_form_errors %}<div class="form-errors" role="alert">{{ formset.non_form_errors }}</div>{% endif %}
-<div class="line-form-grid">{% for line_form in formset %}<fieldset class="line-form"><legend>Line {{ forloop.counter }}</legend>{% for hidden in line_form.hidden_fields %}{{ hidden }}{% endfor %}{% for field in line_form.visible_fields %}{% include 'components/field.html' with field=field %}{% endfor %}{% if line_form.DELETE %}<div class="form-field">{{ line_form.DELETE }} <label for="{{ line_form.DELETE.id_for_label }}">Remove line</label></div>{% endif %}{% if line_form.non_field_errors %}<div class="form-errors">{{ line_form.non_field_errors }}</div>{% endif %}</fieldset>{% endfor %}</div>
-<div class="form-actions"><button class="button button--primary" type="submit">Save draft</button><a class="button button--secondary" href="{% url 'subscriptions:list' %}">Cancel</a></div></form></section>
+<section class="card" style="padding: 32px; border-radius: 18px; max-width: 900px; margin: 0 auto 32px; box-shadow: var(--shadow-modal);">
+  <form method="post" novalidate data-pending-submit>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="message message--error" role="alert" style="margin-bottom: 20px;">
+        <p>{{ form.non_field_errors.0 }}</p>
+      </div>
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 28px;">
+      {% for field in form %}
+        {% include 'components/field.html' with field=field %}
+      {% endfor %}
+    </div>
+
+    <div style="border-top: 1px solid var(--border); padding-top: 24px; margin-bottom: 24px;">
+      <h3 style="margin: 0 0 16px; font-size: 17px; font-weight: 650; letter-spacing: -0.02em;">Subscription lines</h3>
+      {{ formset.management_form }}
+      {% if formset.non_form_errors %}
+        <div class="message message--error" role="alert" style="margin-bottom: 16px;">
+          <p>{{ formset.non_form_errors.0 }}</p>
+        </div>
+      {% endif %}
+
+      <div class="line-form-grid" style="display: flex; flex-direction: column; gap: 16px;">
+        {% for line_form in formset %}
+          <fieldset class="card" style="padding: 20px; border-radius: 14px; background: var(--surface-subtle); border: 1px solid var(--border);">
+            <legend style="font-weight: 600; font-size: 13px; color: var(--muted); padding: 0 6px;">Line {{ forloop.counter }}</legend>
+            {% for hidden in line_form.hidden_fields %}{{ hidden }}{% endfor %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+              {% for field in line_form.visible_fields %}
+                {% if field.name != 'DELETE' %}
+                  {% include 'components/field.html' with field=field %}
+                {% endif %}
+              {% endfor %}
+            </div>
+            {% if line_form.DELETE %}
+              <div style="margin-top: 12px; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--apple-red);">
+                {{ line_form.DELETE }}
+                <label for="{{ line_form.DELETE.id_for_label }}">Remove line</label>
+              </div>
+            {% endif %}
+            {% if line_form.non_field_errors %}
+              <div class="field-errors" style="margin-top: 8px;">{{ line_form.non_field_errors }}</div>
+            {% endif %}
+          </fieldset>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="form-actions" style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border); padding-top: 20px;">
+      <a class="button button--secondary" href="{% url 'subscriptions:list' %}">Cancel</a>
+      <button class="button button--primary" type="submit" data-pending-label="Saving draft…">Save draft</button>
+    </div>
+  </form>
+</section>
 {% endblock %}

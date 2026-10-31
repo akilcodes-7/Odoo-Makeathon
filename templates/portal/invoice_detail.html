@@ -1,13 +1,154 @@
 {% extends 'base.html' %}
 {% load money %}
 {% block title %}{{ invoice.number }}{% endblock %}
-{% block topbar_context %}Invoice details{% endblock %}
-{% block breadcrumbs %}<p class="breadcrumbs"><a href="{% url 'portal:invoices' %}">My invoices</a></p>{% endblock %}
+{% block topbar_context %}Customer portal · {{ invoice.number }}{% endblock %}
+{% block breadcrumbs %}<p class="breadcrumbs"><a href="{% url 'portal:invoices' %}">← My invoices</a></p>{% endblock %}
 {% block page_title %}{{ invoice.number }}{% endblock %}
-{% block page_description %}<p class="page-description">{{ invoice.get_status_display }} · {{ invoice.period_start }} – {{ invoice.period_end }}</p>{% endblock %}
-{% block page_actions %}<a class="button button--primary" href="{% url 'finance_delivery:print' invoice.pk %}">Print invoice</a>{% endblock %}
+{% block page_description %}
+  <p class="page-description">
+    <span class="status-badge status-badge--{{ invoice.status }}" style="margin-right: 8px;">{{ invoice.get_status_display }}</span>
+    Service period: {{ invoice.period_start }} – {{ invoice.period_end }}
+  </p>
+{% endblock %}
+{% block page_actions %}
+  <a class="button button--secondary" href="{% url 'finance_delivery:print' invoice.pk %}" target="_blank">Print invoice</a>
+{% endblock %}
+
 {% block content %}
-<section class="content-grid"><article class="card"><h2>Invoice summary</h2><dl class="detail-list"><dt>Billed to</dt><dd>{{ invoice.customer_name }}<span class="table-secondary">{{ invoice.customer_email }}</span></dd><dt>Billing address</dt><dd>{{ invoice.customer_address|default:'—'|linebreaksbr }}</dd><dt>Invoice date</dt><dd>{{ invoice.invoice_date }}</dd><dt>Due date</dt><dd>{{ invoice.due_date }}</dd><dt>Payment terms</dt><dd>{{ invoice.terms_days_snapshot }} days</dd><dt>Period</dt><dd>{{ invoice.period_start }} – {{ invoice.period_end }}</dd></dl></article>
-<article class="card"><h2>Saved invoice items</h2><div class="table-scroll"><table class="data-table"><thead><tr><th>Description</th><th>Qty</th><th class="numeric">Total</th></tr></thead><tbody>{% for line in invoice.lines.all %}<tr><td>{{ line.product_name }}{% if line.variant_description %}<span class="table-secondary">{{ line.variant_description }}</span>{% endif %}{% for tax in line.tax_snapshots.all %}<span class="table-secondary">{{ tax.tax_name }}</span>{% endfor %}</td><td>{{ line.quantity }}</td><td class="numeric">{{ line.total_paise|money }}</td></tr>{% empty %}<tr><td colspan="3">No saved line items.</td></tr>{% endfor %}</tbody></table></div><dl class="detail-list"><dt>Subtotal</dt><dd>{{ invoice.subtotal_paise|money }}</dd><dt>Discount</dt><dd>−{{ invoice.discount_paise|money }}</dd><dt>Tax</dt><dd>{{ invoice.tax_paise|money }}</dd><dt>Total</dt><dd><strong>{{ invoice.total_paise|money }}</strong></dd><dt>Paid</dt><dd>{{ invoice.paid_paise|money }}</dd><dt>Balance</dt><dd><strong>{{ invoice.balance_paise|money }}</strong></dd></dl></article></section>
-<section class="section-heading"><div><h2>Payment history</h2><p>Payments recorded against this invoice.</p></div></section><div class="table-card"><div class="table-scroll"><table class="data-table"><thead><tr><th>Date</th><th>Method</th><th>Note</th><th class="numeric">Amount</th></tr></thead><tbody>{% for payment in invoice.payments.all %}<tr><td>{{ payment.paid_on }}</td><td>{{ payment.get_method_display }}</td><td>{{ payment.note|default:'—' }}</td><td class="numeric">{{ payment.amount_paise|money }}</td></tr>{% empty %}<tr><td colspan="4">No payments recorded.</td></tr>{% endfor %}</tbody></table></div></div>
+<div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 24px;">
+  <section class="card" style="padding: 20px 24px;">
+    <h3 style="margin: 0 0 14px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600;">Billing details</h3>
+    <dl class="detail-list" style="margin: 0; font-size: 13.5px;">
+      <dt>Billed to</dt>
+      <dd>{{ invoice.customer_name }}<span class="table-secondary" style="display: block; font-size: 12px; color: var(--muted);">{{ invoice.customer_email }}</span></dd>
+      <dt>Billing address</dt>
+      <dd>{{ invoice.customer_address|default:'—'|linebreaksbr }}</dd>
+      <dt>Payment terms</dt>
+      <dd>{{ invoice.terms_days_snapshot }} days</dd>
+    </dl>
+  </section>
+
+  <section class="card" style="padding: 20px 24px;">
+    <h3 style="margin: 0 0 14px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600;">Dates &amp; status</h3>
+    <dl class="detail-list" style="margin: 0; font-size: 13.5px;">
+      <dt>Invoice date</dt>
+      <dd style="font-variant-numeric: tabular-nums;">{{ invoice.invoice_date }}</dd>
+      <dt>Due date</dt>
+      <dd style="font-variant-numeric: tabular-nums;">{{ invoice.due_date }}</dd>
+      <dt>Service period</dt>
+      <dd style="font-variant-numeric: tabular-nums;">{{ invoice.period_start }} – {{ invoice.period_end }}</dd>
+      <dt>Outstanding balance</dt>
+      <dd style="font-variant-numeric: tabular-nums; font-weight: 650; {% if invoice.balance_paise > 0 %}color: var(--apple-orange);{% else %}color: var(--apple-green);{% endif %}">
+        {{ invoice.balance_paise|money }}
+      </dd>
+    </dl>
+  </section>
+</div>
+
+<section class="card" style="padding: 24px; margin-bottom: 24px;">
+  <h3 style="margin: 0 0 16px; font-size: 16px; font-weight: 600; letter-spacing: -0.015em;">Saved invoice items</h3>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th style="text-align: right;">Qty</th>
+          <th class="numeric" style="text-align: right;">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for line in invoice.lines.all %}
+          <tr>
+            <td>
+              <div style="font-weight: 550;">{{ line.product_name }}</div>
+              {% if line.variant_description %}
+                <div class="table-secondary" style="font-size: 12px; color: var(--muted);">{{ line.variant_description }}</div>
+              {% endif %}
+              {% for tax in line.tax_snapshots.all %}
+                <span class="status-badge status-badge--neutral" style="margin-top: 4px; font-size: 11px;">{{ tax.tax_name }}</span>
+              {% endfor %}
+            </td>
+            <td style="text-align: right; font-variant-numeric: tabular-nums;">{{ line.quantity }}</td>
+            <td class="numeric" style="text-align: right; font-weight: 550; font-variant-numeric: tabular-nums;">{{ line.total_paise|money }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="3">No saved line items.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+    <div style="width: 280px; font-size: 13.5px;">
+      <div style="display: flex; justify-content: space-between; padding: 6px 0; color: var(--muted);">
+        <span>Subtotal</span>
+        <span style="font-variant-numeric: tabular-nums;">{{ invoice.subtotal_paise|money }}</span>
+      </div>
+      {% if invoice.discount_paise > 0 %}
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; color: var(--apple-green);">
+          <span>Discount</span>
+          <span style="font-variant-numeric: tabular-nums;">−{{ invoice.discount_paise|money }}</span>
+        </div>
+      {% endif %}
+      <div style="display: flex; justify-content: space-between; padding: 6px 0; color: var(--muted);">
+        <span>Tax</span>
+        <span style="font-variant-numeric: tabular-nums;">{{ invoice.tax_paise|money }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-size: 15px; font-weight: 650;">
+        <span>Total</span>
+        <span style="font-variant-numeric: tabular-nums;">{{ invoice.total_paise|money }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 6px 0; color: var(--muted);">
+        <span>Amount paid</span>
+        <span style="font-variant-numeric: tabular-nums;">{{ invoice.paid_paise|money }}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; padding: 6px 0; font-weight: 650; font-size: 14px; {% if invoice.balance_paise > 0 %}color: var(--apple-orange);{% else %}color: var(--apple-green);{% endif %}">
+        <span>Balance due</span>
+        <span style="font-variant-numeric: tabular-nums;">{{ invoice.balance_paise|money }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="table-card">
+  <div style="padding: 16px 20px; border-bottom: 1px solid var(--border);">
+    <h3 style="margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.015em;">Payment history</h3>
+  </div>
+  <div class="table-scroll">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Method</th>
+          <th>Note</th>
+          <th class="numeric" style="text-align: right;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in invoice.payments.all %}
+          <tr>
+            <td style="font-variant-numeric: tabular-nums;">{{ payment.paid_on }}</td>
+            <td>
+              <span class="status-badge status-badge--neutral">{{ payment.get_method_display }}</span>
+            </td>
+            <td style="color: var(--muted);">{{ payment.note|default:'—' }}</td>
+            <td class="numeric" style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; color: var(--apple-green);">
+              {{ payment.amount_paise|money }}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4">
+              <div class="empty-state" style="padding: 24px;">
+                <p style="margin: 0;">No payments recorded yet.</p>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
 {% endblock %}
