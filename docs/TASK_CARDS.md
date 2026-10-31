@@ -120,7 +120,6 @@ The contributor or assigned model chooses no alternative framework. If an essent
 ## T3A — Dashboard, MRR, filters
 
 - **Owner/window:** Teammate 3 after 13:00. **Dependencies:** S4 schema; payment selector may initially be implemented against specified model. **Read:** §§10–13.
-- **Current UI status:** Reference-led dashboard refresh is implemented in the shared dashboard shell. Admin/customer views and real totals/links were visually inspected at 1280×720; smaller viewport, keyboard-navigation and reduced-motion reviews remain unverified.
 - **Files:** insights/, templates/insights/, feature CSS, tests/test_reporting.py, docs/logs/teammate-3.md.
 - Implement current active/outstanding/overdue/MRR cards, selected-range cash collections, filters, overdue table, one small local chart or accessible trend table. Provide JSON summary API using same selectors.
 - Avoid join-multiplication bugs and N+1 fetching; use SQL sums/counts/subqueries or separate aggregates. Bound all displayed tables and retain filters across pagination.
