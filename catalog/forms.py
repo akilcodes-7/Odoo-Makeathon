@@ -27,7 +27,10 @@ class RupeeField(forms.CharField):
     def prepare_value(self, value):
         if value is None or value == "":
             return ""
-        return f"{Decimal(value) / 100:.2f}"
+        if isinstance(value, int):
+            return f"{Decimal(value) / 100:.2f}"
+        # Bound redisplay: value is already the user's submitted string; return as-is.
+        return str(value)
 
 
 class PercentField(forms.CharField):
@@ -46,7 +49,12 @@ class PercentField(forms.CharField):
             raise forms.ValidationError(self.error_messages["invalid"], code="invalid")
 
     def prepare_value(self, value):
-        return "" if value is None or value == "" else f"{Decimal(value) / 100:.2f}"
+        if value is None or value == "":
+            return ""
+        if isinstance(value, int):
+            return f"{Decimal(value) / 100:.2f}"
+        # Bound redisplay: value is already the user's submitted string; return as-is.
+        return str(value)
 
 
 class PaiseModelForm(forms.ModelForm):
@@ -127,7 +135,7 @@ class TaxForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["rate_percent"].initial = None if self.instance._state.adding else Decimal(self.instance.rate_bps) / Decimal(100)
+        self.fields["rate_percent"].initial = None if self.instance._state.adding else self.instance.rate_bps
 
     def clean_rate_percent(self):
         return self.cleaned_data["rate_percent"]

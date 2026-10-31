@@ -35,6 +35,10 @@ def _customer_owns(subscription, actor):
 
 
 def _validate_confirmable(subscription, today):
+    if not subscription.plan.is_active:
+        raise DomainValidationError("plan_archived", "The selected plan has been archived.")
+    if not subscription.plan.primary_product.is_active:
+        raise DomainValidationError("product_archived", "The plan's primary product has been archived.")
     if subscription.status == Subscription.Status.QUOTATION:
         if not subscription.quote_expires_on:
             raise DomainValidationError("quote_expiry_missing", "Set a quote expiry before confirming.")
@@ -49,15 +53,19 @@ def _validate_confirmable(subscription, today):
     if any(line.quantity < 1 or line.unit_price_paise < 0 for line in lines):
         raise DomainValidationError("line_invalid", "Line quantities and prices must be valid.")
     for line in lines:
+        if not line.product.is_active:
+            raise DomainValidationError("line_product_archived", f"Product '{line.product.name}' on line {line.position} has been archived.")
+        if line.variant_id and not line.variant.is_active:
+            raise DomainValidationError("line_variant_archived", f"Variant on line {line.position} has been archived.")
         if line.variant_id and line.variant.product_id != line.product_id:
             raise DomainValidationError("variant_product_mismatch", "A selected variant does not belong to its product.")
 
 
-def transition_subscription(subscription_id, target, *, actor, reason=""):
+def transition_subscription(subscription_id, target, *, actor, reason="", as_of=None):
     """Apply one legal status change and record its event atomically."""
-    today = timezone.localdate()
+    today = as_of or timezone.localdate()
     with transaction.atomic():
-        subscription = Subscription.objects.select_for_update().select_related("plan").get(pk=subscription_id)
+        subscription = Subscription.objects.select_for_update().select_related("plan", "plan__primary_product").get(pk=subscription_id)
         source = subscription.status
         if target not in _SUBSCRIPTION_NEXT.get(source, set()):
             raise DomainValidationError("invalid_transition", f"Cannot change {source} to {target}.")
@@ -130,6 +138,33 @@ def finalize_expired_subscription(subscription_id, *, actor=None, as_of=None):
         subscription.closed_on = today
         subscription.closure_reason = "Automatically closed after final billable period."
         subscription.save(update_fields=["status", "closed_on", "closure_reason", "updated_at"])
+        SubscriptionEvent.objects.create(
+            subscription=subscription, actor=actor, action=SubscriptionEvent.Action.STATUS,
+            from_status=source, to_status=Subscription.Status.CLOSED,
+            note=subscription.closure_reason,
+        )
+        return subscription
+
+
+def finalize_expired_paused_subscription(subscription_id, *, actor=None, as_of=None):
+    """Close an expired paused auto-close contract without billing its paused interval."""
+    today = as_of or timezone.localdate()
+    with transaction.atomic():
+        subscription = Subscription.objects.select_for_update().get(pk=subscription_id)
+        if (
+            subscription.status != Subscription.Status.ACTIVE
+            or not subscription.is_paused
+            or not subscription.auto_close_snapshot
+            or subscription.expiry_date >= today
+        ):
+            return subscription
+        source = subscription.status
+        subscription.status = Subscription.Status.CLOSED
+        subscription.closed_on = today
+        subscription.is_paused = False
+        subscription.pause_effective_on = None
+        subscription.closure_reason = "Automatically closed after expiry (was paused)."
+        subscription.save(update_fields=["status", "closed_on", "closure_reason", "is_paused", "pause_effective_on", "updated_at"])
         SubscriptionEvent.objects.create(
             subscription=subscription, actor=actor, action=SubscriptionEvent.Action.STATUS,
             from_status=source, to_status=Subscription.Status.CLOSED,
@@ -211,7 +246,12 @@ def renew_subscription(subscription_id, *, actor, start_date=None, expiry_date=N
         if existing:
             return existing
         if original.status != Subscription.Status.CLOSED and today <= original.expiry_date:
-            raise DomainValidationError("renewal_too_early", "Renewal is available after closure or expiry.")
+            in_final_period = (
+                original.next_invoice_date is None
+                or original.next_invoice_date > original.expiry_date
+            )
+            if not in_final_period:
+                raise DomainValidationError("renewal_too_early", "Renewal is available after closure, expiry, or during the final service period.")
         if original.status == Subscription.Status.CLOSED and original.closed_on and original.closed_on < original.expiry_date:
             last_period_end = original.invoices.exclude(status=Invoice.Status.CANCELLED).aggregate(last=Max("period_end"))["last"]
             first_unpurchased_day = last_period_end or original.start_date

@@ -36,7 +36,11 @@ def index(request):
 @role_required(User.Role.ADMIN, User.Role.STAFF)
 def create(request):
     form = DraftSubscriptionForm(request.POST or None)
-    plan_id = request.POST.get("plan") if request.method == "POST" else request.GET.get("plan")
+    plan_id_raw = request.POST.get("plan") if request.method == "POST" else request.GET.get("plan")
+    try:
+        plan_id = int(plan_id_raw) if plan_id_raw else None
+    except (ValueError, TypeError):
+        plan_id = None
     plan = form.fields["plan"].queryset.filter(pk=plan_id).first() if plan_id else None
     formset = SubscriptionLineFormSet(request.POST or None, instance=Subscription(), plan=plan)
     valid_form = form.is_valid() if request.method == "POST" else False
@@ -86,10 +90,19 @@ def edit(request, subscription_id):
         messages.error(request, "Confirmed contract terms are locked. Create a renewal draft to change them.")
         return redirect("subscriptions:detail", subscription.pk)
     form = DraftSubscriptionForm(request.POST or None, instance=subscription)
-    plan = form.fields["plan"].queryset.filter(pk=request.POST.get("plan")).first() if request.method == "POST" else subscription.plan
+    plan_id_raw = request.POST.get("plan") if request.method == "POST" else None
+    try:
+        plan_id = int(plan_id_raw) if plan_id_raw else None
+    except (ValueError, TypeError):
+        plan_id = None
+    plan = form.fields["plan"].queryset.filter(pk=plan_id).first() if plan_id else subscription.plan
     formset = SubscriptionLineFormSet(request.POST or None, instance=subscription, plan=plan)
     if request.method == "POST" and form.is_valid() and formset.is_valid():
         with transaction.atomic():
+            locked = Subscription.objects.select_for_update().get(pk=subscription.pk)
+            if locked.status != Subscription.Status.DRAFT:
+                messages.error(request, "This contract was confirmed while you were editing. Your changes were not saved.")
+                return redirect("subscriptions:detail", subscription.pk)
             form.save()
             formset.save()
         messages.success(request, "Draft updated. Issue the quotation when the terms are ready.")

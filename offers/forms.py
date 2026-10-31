@@ -21,7 +21,10 @@ class RupeeField(forms.CharField):
     def prepare_value(self, value):
         if value in self.empty_values:
             return ""
-        return f"{Decimal(value) / Decimal(100):.2f}"
+        if isinstance(value, int):
+            return f"{Decimal(value) / Decimal(100):.2f}"
+        # Bound redisplay: value is already the user's submitted string; return as-is.
+        return str(value)
 
 
 class PercentField(forms.CharField):
@@ -40,7 +43,10 @@ class PercentField(forms.CharField):
     def prepare_value(self, value):
         if value in self.empty_values:
             return ""
-        return f"{Decimal(value) / Decimal(100):.2f}"
+        if isinstance(value, int):
+            return f"{Decimal(value) / Decimal(100):.2f}"
+        # Bound redisplay: value is already the user's submitted string; return as-is.
+        return str(value)
 
 
 class DiscountForm(forms.ModelForm):

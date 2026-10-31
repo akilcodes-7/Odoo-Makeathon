@@ -69,7 +69,8 @@ def variants(request):
 
 @role_required(User.Role.ADMIN)
 def product_create(request):
-    return _edit(request, ProductForm(), "Product", "catalog:products")
+    form = ProductForm(request.POST or None)
+    return _edit(request, form, "Product", "catalog:products")
 
 
 @role_required(User.Role.ADMIN)

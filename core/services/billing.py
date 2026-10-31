@@ -221,7 +221,7 @@ def _one_period(subscription_id, as_of, actor):
 
 def run_due_billing(*, as_of: date, subscription_ids=None, max_periods_per_subscription=24, actor=None) -> BillingResult:
     """Run a bounded batch, retaining every unprocessed cursor for the next run."""
-    from core.services.lifecycle import finalize_expired_subscription, transition_subscription
+    from core.services.lifecycle import finalize_expired_subscription, finalize_expired_paused_subscription, transition_subscription
 
     if max_periods_per_subscription < 1:
         raise ValueError("max_periods_per_subscription must be positive.")
@@ -237,7 +237,7 @@ def run_due_billing(*, as_of: date, subscription_ids=None, max_periods_per_subsc
         sub = Subscription.objects.get(pk=sub_id)
         try:
             if sub.status == Subscription.Status.CONFIRMED:
-                transition_subscription(sub_id, Subscription.Status.ACTIVE, actor=actor, reason="Activated by due billing run.")
+                transition_subscription(sub_id, Subscription.Status.ACTIVE, actor=actor, reason="Activated by due billing run.", as_of=as_of)
         except Exception as exc:
             errors.append(f"{sub.number}: {exc}")
             continue
@@ -245,7 +245,11 @@ def run_due_billing(*, as_of: date, subscription_ids=None, max_periods_per_subsc
             current = Subscription.objects.get(pk=sub_id)
             if current.is_paused or current.next_invoice_date is None or current.next_invoice_date > as_of:
                 break
-            period = _period_from_cursor(current)
+            try:
+                period = _period_from_cursor(current)
+            except DomainValidationError as exc:
+                errors.append(f"{current.number}: {exc.message}")
+                break
             if period is None:
                 current.next_invoice_date = None
                 current.save(update_fields=["next_invoice_date", "updated_at"])
@@ -280,6 +284,20 @@ def run_due_billing(*, as_of: date, subscription_ids=None, max_periods_per_subsc
             finalize_expired_subscription(sub_id, actor=actor, as_of=as_of)
         except Exception as exc:
             errors.append(f"{current.number}: auto-close failed: {exc}")
+    paused_expiry_ids = Subscription.objects.filter(
+        status=Subscription.Status.ACTIVE,
+        auto_close_snapshot=True,
+        expiry_date__lt=as_of,
+        is_paused=True,
+    ).values_list("pk", flat=True)
+    if subscription_ids is not None:
+        paused_expiry_ids = paused_expiry_ids.filter(pk__in=subscription_ids)
+    for sub_id in paused_expiry_ids:
+        current = Subscription.objects.get(pk=sub_id)
+        try:
+            finalize_expired_paused_subscription(sub_id, actor=actor, as_of=as_of)
+        except Exception as exc:
+            errors.append(f"{current.number}: paused auto-close failed: {exc}")
     return BillingResult(
         created_ids=tuple(created), existing_ids=tuple(existing), errors=tuple(errors),
         remaining_due_count=remaining,
