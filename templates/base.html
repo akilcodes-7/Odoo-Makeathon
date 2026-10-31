@@ -10,11 +10,13 @@
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/components.css' %}">
   {% block page_css %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/polish.css' %}">
 </head>
 <body class="app-body">
   <a class="skip-link" href="#main-content">Skip to main content</a>
-  <div class="app-shell">
+  <div class="app-shell{% if not user.is_authenticated %} app-shell--public{% endif %}">
     <div class="sidebar-scrim" data-drawer-scrim hidden></div>
+    {% if user.is_authenticated %}
     <aside class="sidebar" id="app-sidebar" aria-label="Primary navigation" data-sidebar>
       <a class="brand" href="{% url 'insights:dashboard' as dashboard_url %}{% url 'insights:index' as dashboard_fallback %}{{ dashboard_url|default:dashboard_fallback|default:'#' }}" aria-label="Brightloop home">
         <span class="brand-mark" aria-hidden="true">b</span>
@@ -76,6 +78,7 @@
             <span>Operations</span>
       </div>
     </aside>
+    {% endif %}
 
     <div class="app-main">
       <header class="topbar">
@@ -114,6 +117,7 @@
   </div>
   {% include 'components/confirmation_dialog.html' %}
   <script src="{% static 'js/app.js' %}" defer></script>
+  <script src="{% static 'js/polish.js' %}" defer></script>
   {% block page_js %}{% endblock %}
 </body>
 </html>

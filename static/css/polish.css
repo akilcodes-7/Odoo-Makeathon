@@ -1,0 +1,116 @@
+/* -------------------------------------------------------------------------- */
+/* UI polish layer: loaded after every other stylesheet, so it only adds.     */
+/* Remove the <link> in base.html to turn everything here off.                */
+/* -------------------------------------------------------------------------- */
+
+/* Soft ambient glow behind the content area */
+.app-main {
+  background: radial-gradient(900px 360px at 85% -120px, rgba(0, 113, 227, 0.08), transparent 70%) no-repeat;
+}
+
+/* Logged-out pages (login, signup, reset): no sidebar */
+.app-shell--public .app-main { margin-left: 0; }
+.app-shell--public .menu-toggle { display: none; }
+.app-shell--public .topbar { display: none; }
+.app-shell--public .page-content { min-height: 100vh; padding-top: 32px; }
+.app-shell--public .message-region:empty { display: none; }
+
+/* The skip link's large shadow was bleeding into the top-left corner while hidden */
+.skip-link:not(:focus) { box-shadow: none; }
+
+/* Smaller sign-out button in the top bar */
+.topbar .button { min-height: 34px; padding: 0 14px; font-size: 13px; white-space: nowrap; }
+.topbar-context { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---- Collapsible filters ------------------------------------------------- */
+.filter-panel { margin: 0 0 18px; }
+.filter-panel > summary {
+  display: inline-flex; align-items: center; gap: 10px; padding: 9px 16px;
+  list-style: none; cursor: pointer; user-select: none;
+  color: var(--text-secondary); font-size: 13px; font-weight: 600;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
+  transition: transform 100ms ease-out, border-color var(--spring-duration-fast) ease;
+}
+.filter-panel > summary::-webkit-details-marker { display: none; }
+.filter-panel > summary:hover { border-color: rgba(0, 113, 227, 0.3); }
+.filter-panel > summary:active { transform: scale(0.97); }
+.filter-panel > summary::after {
+  content: ""; width: 7px; height: 7px; margin-left: 2px;
+  border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted);
+  transform: rotate(45deg) translateY(-2px); transition: transform var(--spring-duration-normal) var(--spring-easing);
+}
+.filter-panel[open] > summary::after { transform: rotate(225deg) translateY(-2px); }
+.filter-panel .filter-summary-range { color: var(--muted); font-weight: 500; }
+.filter-panel[open] .report-filters { margin-top: 12px; animation: polish-rise 280ms var(--spring-easing) both; }
+
+/* ---- KPI cards ------------------------------------------------------------ */
+/* Six cards: 3 x 2 on desktop, so there is no orphan card on a second row */
+.report-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1000px) { .report-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) {
+  .report-metrics { gap: 10px; }
+  .report-metrics .metric-card { padding: 16px; }
+  .report-metrics .metric-value { font-size: 22px; }
+}
+
+/* The one bold element on the page: recurring revenue */
+.metric-card--lead {
+  color: #fff; border-color: transparent;
+  background: linear-gradient(135deg, #0071e3 0%, #0a8fb4 60%, #00a299 100%);
+  box-shadow: 0 14px 34px -12px rgba(0, 113, 227, 0.55);
+}
+.metric-card--lead .metric-label,
+.metric-card--lead .metric-note,
+.metric-card--lead .metric-value,
+.metric-card--lead .help { color: #fff; }
+.metric-card--lead .metric-label, .metric-card--lead .metric-note { opacity: 0.82; }
+.metric-card--lead:hover { border-color: transparent; box-shadow: 0 18px 40px -12px rgba(0, 113, 227, 0.65); }
+
+/* Overdue turns red only when something is actually overdue */
+.metric-card--alert .metric-value { color: var(--danger); }
+.metric-card--alert { border-color: rgba(215, 0, 21, 0.18); }
+
+/* One staggered entrance when the dashboard loads */
+.report-metrics .metric-card { animation: polish-rise 520ms var(--spring-easing) both; }
+.report-metrics .metric-card:nth-child(2) { animation-delay: 60ms; }
+.report-metrics .metric-card:nth-child(3) { animation-delay: 120ms; }
+.report-metrics .metric-card:nth-child(4) { animation-delay: 180ms; }
+.report-metrics .metric-card:nth-child(5) { animation-delay: 240ms; }
+.report-metrics .metric-card:nth-child(6) { animation-delay: 300ms; }
+@keyframes polish-rise { from { opacity: 0; transform: translateY(10px); } }
+
+/* ---- Collections bar chart (built by polish.js from the table) ------------ */
+.collections-chart {
+  display: flex; align-items: flex-end; gap: 4px; height: 150px; padding: 18px 16px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.collections-chart .bar {
+  position: relative; flex: 1 1 0; min-width: 2px; max-width: 44px; height: var(--h);
+  border-radius: 6px 6px 2px 2px;
+  background: linear-gradient(180deg, #2f8cf0, #00a299);
+  transform-origin: bottom; animation: polish-grow 600ms var(--spring-easing) both;
+  animation-delay: calc(var(--i) * 25ms);
+  transition: filter 120ms ease;
+}
+.collections-chart .bar:hover { filter: brightness(1.12); }
+.collections-chart .bar::after {
+  content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%;
+  transform: translateX(-50%); padding: 4px 8px; border-radius: 8px; white-space: nowrap;
+  color: #fff; background: #1d1d1f; font-size: 11px; opacity: 0; pointer-events: none;
+  transition: opacity 120ms ease;
+}
+.collections-chart .bar:hover::after { opacity: 1; }
+@keyframes polish-grow { from { transform: scaleY(0); opacity: 0; } }
+
+/* ---- Accessibility and print --------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .report-metrics .metric-card, .collections-chart .bar, .filter-panel[open] .report-filters { animation: none !important; }
+  .filter-panel > summary, .filter-panel > summary::after { transition: none !important; }
+}
+@media print {
+  .filter-panel, .collections-chart { display: none !important; }
+  .metric-card--lead { color: #000; background: none; box-shadow: none; border-color: var(--border); }
+  .metric-card--lead .metric-label, .metric-card--lead .metric-note,
+  .metric-card--lead .metric-value, .metric-card--lead .help { color: #000; }
+}
