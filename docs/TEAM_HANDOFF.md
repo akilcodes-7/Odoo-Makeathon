@@ -1,15 +1,15 @@
 # Current handoff — implementation integration
 
-**Last recorded update:** 2026-10-31 12:02 IST. The user confirmed lowercase `dev` as the single shared integration and team handoff branch, with the existing repository default retained. Remote `dev` was fetched at `32f797d` before publishing the handoff documentation. The [single repair/UI plan](REPAIR_AND_UI_REDESIGN_PLAN.md) and [audit](AUDIT_2026-10-31.md) describe remaining work; no repairs or redesign have started.
+**Last recorded update:** 2026-10-31 13:44 IST. The current checkout is `Main` at `0e5595b`; read-only remote verification found `origin/Main` and `origin/dev` at the same commit, with `Main` as the default branch. This supersedes the historical lowercase-`dev` handoff below. A07 renewal eligibility and staff/customer controls are corrected locally. The full suite now discovers 123 tests: 120 passed and 3 concurrency tests skipped on in-memory SQLite; the focused on-disk concurrency suite previously passed all 3. Django checks, migration drift and diff whitespace checks pass. No changes have been pushed. A01–A06, A08–A10 and visual acceptance remain open. See the [repair/UI plan](REPAIR_AND_UI_REDESIGN_PLAN.md) and [audit](AUDIT_2026-10-31.md).
 
 ## Team starting point
 
 ```text
-git clone --branch dev https://github.com/akilcodes-7/Odoo-Makeathon.git
+git clone --branch Main https://github.com/akilcodes-7/Odoo-Makeathon.git
 cd Odoo-Makeathon
 ```
 
-Read `docs/REPAIR_AND_UI_REDESIGN_PLAN.md` first, then the assigned audit finding/task card. All completed work integrates into `dev`. Historical task branches are not separate handoff targets. Keep shared-file ownership and serialize integration; preserve the existing remote default and other branches.
+Read `docs/REPAIR_AND_UI_REDESIGN_PLAN.md` first, then the assigned audit finding/task card. Historical references to `dev` below describe the earlier handoff and do not reflect the current default branch. Keep shared-file ownership and serialize integration; preserve other branches.
 
 ## Deadline actions first
 
@@ -17,9 +17,9 @@ Read `docs/REPAIR_AND_UI_REDESIGN_PLAN.md` first, then the assigned audit findin
 
 ## Actual state and verified limits
 
-- **Audit overrides blanket completion claims:** product creation is blocked; tax and failed money-form rendering can corrupt values; stale draft saves can revert confirmation; renewal, paused expiry, eligibility and billing error/date handling need repair. Full audit suite: 96 discovered, 93 passed, 3 skipped; dedicated on-disk concurrency suite: 3 passed. Detailed reproductions are in `AUDIT_2026-10-31.md`. The rows below describe implementation coverage, not complete acceptance.
+- **Audit overrides blanket completion claims:** product creation, tax and failed-form money handling, stale draft protection, paused expiry, and billing error/date handling still need attention. A07 renewal handling was repaired locally with boundary, permissions/control-visibility checks; its original finding remains documented as a baseline reproduction. Current suite: 123 discovered, 120 passed, 3 skipped; dedicated on-disk concurrency suite: 3 passed before this A07-only change. Detailed findings are in `AUDIT_2026-10-31.md`.
 - S1 auth/reset/roles, S2 catalog CRUD, S3 subscriptions/lifecycle, S4 recurring billing/invoice states, T1A discounts, T1B templates, T2A payments, T2B send/print, T3A reporting, T3B portal, and S5 scale fixture/benchmark are implemented. Detailed evidence is in `docs/DEMO_AND_CHECKS.md` and `docs/REQUIREMENTS.md`.
-- Latest full default suite: 96 tests discovered, 93 passed and three concurrency tests skipped on Django's in-memory SQLite test DB. Dedicated on-disk concurrency run passed all three: duplicate period, max-use discount, and distinct payment overpay.
+- Current full default suite: 123 tests discovered, 120 passed and three concurrency tests skipped on Django's in-memory SQLite test DB. The prior dedicated on-disk concurrency run passed all three: duplicate period, max-use discount, and distinct payment overpay.
 - `manage.py check`, migration drift check, `git diff --check`, and `node --check static/js/app.js` pass. A fresh temporary SQLite migration and seed run passed; `seed_scale` created 5,000 subscriptions, invoices and invoice lines plus 2,500 payments.
 - Five authenticated backend routes passed the <2-second performance target; each had 4–16 queries after the portal balance N+1 was fixed. Browser rendering time was not measured. Only the currently available 890×921 browser layout was visually inspected; 390/768/1440 screenshots remain pending.
 - `/tmp` contains only temporary demo/test databases created during this task; none is tracked. Root `db.sqlite3` remains unseeded.
@@ -33,7 +33,7 @@ Read `docs/REPAIR_AND_UI_REDESIGN_PLAN.md` first, then the assigned audit findin
 
 | Owner | Branch target | Cards | Actual status | Blocker/next action |
 | --- | --- | --- | --- | --- |
-| Lead / repo owner | `dev` | S0–S5, integration | Implementation published through `32f797d`; audit reproduced A01–A10. Acceptance is incomplete. The single repair/UI plan is the next work checklist. | Coordinate assignments; lead owns shared lifecycle/billing/subscription views and common UI. |
+| Lead / repo owner | `Main` | A07 repair; other S0–S5/integration work | A07 implemented locally on top of `0e5595b`; 123 tests discovered, 120 pass and 3 skip. Not pushed. Remaining audit findings and UI acceptance are incomplete. | Continue with A01–A06/A08–A10 in repair-plan order; preserve shared lifecycle/billing/subscription ownership. |
 | Teammate 1 scope | `dev` | T1A, T1B | Services and template flow exist; audit A03 reproduces discount money/percentage redisplay corruption. Existing passing tests do not cover failed-form resubmission. | Fix A03 under assigned ownership; follow the repair/UI plan. No human Git activity attributed. |
 | Teammate 2 scope | `dev` | T2A, T2B | Payment service/UI and invoice send/print implemented; payment/delivery tests and payment concurrency pass. | Finance UI rollout and integration verification under assigned ownership; no human Git activity attributed. |
 | Teammate 3 scope | `dev` | T3A, T3B | Reporting/portal checks pass, but renewal presentation, invoice bounds and visual acceptance remain incomplete. | Follow portal/UI repairs and required viewport checks; no human Git activity attributed. |

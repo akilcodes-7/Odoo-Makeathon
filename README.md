@@ -7,7 +7,7 @@ A Django application for managing products, recurring plans, subscriptions, invo
 ## Quick start
 
 ```bash
-git clone --branch dev https://github.com/akilcodes-7/Odoo-Makeathon.git
+git clone --branch Main https://github.com/akilcodes-7/Odoo-Makeathon.git
 cd Odoo-Makeathon
 python3.12 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
@@ -26,7 +26,7 @@ Open **http://127.0.0.1:8000** and log in with one of the demo accounts below.
 
 ## Demo accounts & credentials
 
-All demo accounts share the password: **`OdooDemo@2026!`**
+The first `seed_demo` run asks you to choose one local password for the demo accounts. Use the password you chose when signing in; the repository does not ship a shared demo password.
 
 | Role       | Email                        | Organization / Name          |
 |------------|------------------------------|------------------------------|
@@ -35,7 +35,7 @@ All demo accounts share the password: **`OdooDemo@2026!`**
 | Customer 1 | `customer@brightloop.test`   | Acme Technologies Pvt Ltd    |
 | Customer 2 | `customer2@brightloop.test`  | Globex Corporation India     |
 
-> To re-seed or change credentials, run `python manage.py seed_demo --reset-passwords`.
+> Re-running `seed_demo` leaves existing passwords unchanged. To reset local demo passwords, run `python manage.py seed_demo --reset-passwords`; it prompts for a new password unless `BRIGHTLOOP_DEMO_PASSWORD` is set in your environment.
 
 ---
 
@@ -127,7 +127,10 @@ export EMAIL_PORT=587
 export EMAIL_HOST_USER=you@example.com
 export EMAIL_HOST_PASSWORD=secret
 export EMAIL_USE_TLS=true
+export EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 ```
+
+Without `EMAIL_BACKEND`, Django uses the console backend and prints messages to the terminal.
 
 ---
 

@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.utils import timezone
@@ -6,7 +7,7 @@ from django.utils import timezone
 from accounts.models import User
 from core.models import Customer, Plan, Product, Subscription, SubscriptionEvent, SubscriptionLine
 from core.services.exceptions import DomainValidationError
-from core.services.lifecycle import transition_subscription
+from core.services.lifecycle import renewal_is_available, transition_subscription
 from core.services.lifecycle import pause_subscription, renew_subscription, resume_subscription
 
 
@@ -122,3 +123,34 @@ class LifecycleServiceTests(TestCase):
         self.assertEqual(draft.status, Subscription.Status.DRAFT)
         self.assertEqual(draft.start_date, closed.invoices.order_by("-period_end").first().period_end)
         self.assertEqual(draft.lines.count(), closed.lines.count())
+
+    def test_renewal_opens_at_the_start_of_the_final_anchored_period(self):
+        subscription = self.make_draft(start=date(2026, 1, 31))
+        subscription.status = Subscription.Status.ACTIVE
+        subscription.expiry_date = date(2026, 3, 31)
+        subscription.billing_anchor_date = date(2026, 1, 31)
+        subscription.billing_period = Plan.Period.MONTHLY
+        subscription.next_invoice_date = date(2026, 3, 1)
+        subscription.renewable_snapshot = True
+        subscription.save()
+
+        self.assertFalse(renewal_is_available(subscription, as_of=date(2026, 3, 30)))
+        self.assertTrue(renewal_is_available(subscription, as_of=date(2026, 3, 31)))
+        with patch("core.services.lifecycle.timezone.localdate", return_value=date(2026, 3, 31)):
+            draft = renew_subscription(subscription.pk, actor=self.staff)
+        self.assertEqual(draft.start_date, date(2026, 4, 1))
+
+    def test_future_confirmed_contract_with_empty_cursor_cannot_renew(self):
+        future = date(2026, 12, 15)
+        subscription = self.make_draft(start=future)
+        subscription.expiry_date = date(2027, 3, 14)
+        subscription.save(update_fields=["expiry_date"])
+        transition_subscription(subscription.pk, Subscription.Status.QUOTATION, actor=self.staff)
+        transition_subscription(subscription.pk, Subscription.Status.CONFIRMED, actor=self.staff)
+
+        subscription.refresh_from_db()
+        self.assertIsNone(subscription.next_invoice_date)
+        self.assertFalse(renewal_is_available(subscription, as_of=date(2026, 10, 31)))
+        with self.assertRaises(DomainValidationError) as ctx:
+            renew_subscription(subscription.pk, actor=self.staff)
+        self.assertEqual(ctx.exception.code, "renewal_too_early")

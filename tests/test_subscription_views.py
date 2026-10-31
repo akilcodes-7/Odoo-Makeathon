@@ -90,3 +90,24 @@ class SubscriptionWorkflowViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         subscription.refresh_from_db()
         self.assertEqual(subscription.status, Subscription.Status.CONFIRMED)
+
+    def test_renewal_action_is_shown_only_when_shared_rule_allows_it(self):
+        today = timezone.localdate()
+        final_period = Subscription.objects.create(
+            number="SUB-FINAL", customer=self.customer, plan=self.plan,
+            status=Subscription.Status.ACTIVE, start_date=today - timedelta(days=28),
+            expiry_date=today + timedelta(days=2), billing_anchor_date=today - timedelta(days=28),
+            billing_period=Plan.Period.MONTHLY, renewable_snapshot=True,
+        )
+        future_confirmed = Subscription.objects.create(
+            number="SUB-FUTURE", customer=self.customer, plan=self.plan,
+            status=Subscription.Status.CONFIRMED, start_date=today + timedelta(days=30),
+            expiry_date=today + timedelta(days=90), billing_anchor_date=today + timedelta(days=30),
+            billing_period=Plan.Period.MONTHLY, renewable_snapshot=True,
+        )
+        self.client.force_login(self.staff)
+
+        final_response = self.client.get(reverse("subscriptions:detail", args=[final_period.pk]))
+        self.assertContains(final_response, "Request renewal")
+        future_response = self.client.get(reverse("subscriptions:detail", args=[future_confirmed.pk]))
+        self.assertNotContains(future_response, "Request renewal")

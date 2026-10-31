@@ -78,3 +78,11 @@ Role: solo morning spine; afternoon reviews/integration/shared code. Branch targ
 
 Entry format: IST timestamp; card; what changed/why; files; checks/results; commit/PR; blocker; next owner/action.
 
+## 2026-10-31 13:44 IST — A07 renewal eligibility and handoff correction
+
+- **Changed:** Added one anchored-schedule renewal eligibility rule to the lifecycle service and reused it for staff and customer detail actions. Future confirmed subscriptions no longer become renewable because their activation cursor is empty. Final-period renewal is available from the anchored final boundary or after the final period is invoiced. Reject explicit successor start dates that overlap the current term or purchased period. Corrected README password/SMTP setup and current branch instructions; updated A07/handoff status.
+- **Files:** `core/services/lifecycle.py`, `subscriptions/views.py`, `portal/views.py`, `templates/subscriptions/detail.html`, `tests/test_lifecycle.py`, `tests/test_subscription_views.py`, `tests/test_portal.py`, `README.md`, `docs/AUDIT_2026-10-31.md`, `docs/REPAIR_AND_UI_REDESIGN_PLAN.md`, `docs/TEAM_HANDOFF.md`.
+- **Checks:** Focused lifecycle/portal/staff-view and prior A07 regression tests: 27 passed. Full suite: 123 discovered, 120 passed, 3 in-memory concurrency skips. `manage.py check`, migration drift and `git diff --check` passed.
+- **Git:** Local `Main`, based on `0e5595b`; no commit or push. At the last remote read check, `Main` and `dev` matched this baseline.
+- **Limitations/next:** A01–A06 and A08–A10 remain; A07 concurrency, expired/early-close and abandoned-successor acceptance need further focused review. Continue with the next assigned repair before the 17:00 IST code cutoff.
+

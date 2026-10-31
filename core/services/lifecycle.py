@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from core.models import Invoice, Payment, Subscription, SubscriptionEvent
 from core.services.exceptions import DomainValidationError
-from core.services.dates import add_period
+from core.services.dates import add_period, period_index_for_date
 
 
 _SUBSCRIPTION_NEXT = {
@@ -228,6 +228,37 @@ def resume_subscription(subscription_id, *, actor, reason=""):
         return subscription
 
 
+def renewal_is_available(subscription, *, as_of=None):
+    """Whether the closed, expired, or currently final-period contract can renew."""
+    today = as_of or timezone.localdate()
+    if not subscription.renewable_snapshot:
+        return False
+    if subscription.status == Subscription.Status.CLOSED:
+        return True
+    if subscription.status != Subscription.Status.ACTIVE:
+        return False
+    if today > subscription.expiry_date:
+        return True
+    if today < subscription.start_date:
+        return False
+    # Billing advances this cursor only after the period is invoiced. A
+    # missing cursor or one beyond expiry therefore also proves the final
+    # service period has already been billed, including advance billing.
+    if subscription.next_invoice_date is None or subscription.next_invoice_date > subscription.expiry_date:
+        return True
+    final_index = period_index_for_date(
+        subscription.billing_anchor_date,
+        subscription.billing_period,
+        subscription.expiry_date,
+    )
+    final_start = add_period(
+        subscription.billing_anchor_date,
+        subscription.billing_period,
+        final_index,
+    )
+    return today >= final_start
+
+
 def renew_subscription(subscription_id, *, actor, start_date=None, expiry_date=None):
     """Create or return the single independent draft successor."""
     from core.models import SubscriptionLine
@@ -245,13 +276,8 @@ def renew_subscription(subscription_id, *, actor, start_date=None, expiry_date=N
         existing = Subscription.objects.filter(renewed_from=original).first()
         if existing:
             return existing
-        if original.status != Subscription.Status.CLOSED and today <= original.expiry_date:
-            in_final_period = (
-                original.next_invoice_date is None
-                or original.next_invoice_date > original.expiry_date
-            )
-            if not in_final_period:
-                raise DomainValidationError("renewal_too_early", "Renewal is available after closure, expiry, or during the final service period.")
+        if not renewal_is_available(original, as_of=today):
+            raise DomainValidationError("renewal_too_early", "Renewal is available after closure, expiry, or during the final service period.")
         if original.status == Subscription.Status.CLOSED and original.closed_on and original.closed_on < original.expiry_date:
             last_period_end = original.invoices.exclude(status=Invoice.Status.CANCELLED).aggregate(last=Max("period_end"))["last"]
             first_unpurchased_day = last_period_end or original.start_date
@@ -259,6 +285,8 @@ def renew_subscription(subscription_id, *, actor, start_date=None, expiry_date=N
         else:
             default_start = max(today, original.expiry_date + timedelta(days=1))
         start = start_date or default_start
+        if start < default_start:
+            raise DomainValidationError("renewal_overlap", "Renewal cannot start before the current service term or purchased period ends.")
         end = expiry_date or (add_period(start, original.billing_period, 1) - timedelta(days=1))
         if end < start:
             raise DomainValidationError("renewal_dates_invalid", "Renewal expiry must be on or after its start.")

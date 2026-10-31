@@ -12,6 +12,7 @@ from core.models import Invoice, Payment, Subscription
 from core.services.exceptions import DomainValidationError
 from core.services.lifecycle import (
     pause_subscription,
+    renewal_is_available,
     renew_subscription,
     resume_subscription,
     transition_subscription,
@@ -106,18 +107,7 @@ def subscription_detail(request, subscription_id):
         "successor": successor,
         "renewal_requested": successor is not None,
         "invoice_page": invoice_page,
-        "can_request_renewal": (
-            subscription.renewable_snapshot
-            and successor is None
-            and (
-                subscription.status == Subscription.Status.CLOSED
-                or subscription.expiry_date < timezone.localdate()
-                # Also allow during the final billing period (next_invoice_date is None
-                # means all periods are billed; or it points past expiry_date)
-                or subscription.next_invoice_date is None
-                or subscription.next_invoice_date > subscription.expiry_date
-            )
-        ),
+        "can_request_renewal": renewal_is_available(subscription) and successor is None,
     })
 
 

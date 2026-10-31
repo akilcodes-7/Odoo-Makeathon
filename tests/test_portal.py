@@ -85,6 +85,18 @@ class CustomerPortalTests(TestCase):
         self.assertEqual(self.client.get(reverse("portal:invoice_detail", args=[self.draft_invoice.pk])).status_code, 404)
         self.assertEqual(self.client.get(reverse("finance_delivery:print", args=[self.foreign_invoice.pk])).status_code, 404)
 
+    def test_renewal_action_appears_at_the_start_of_the_final_period(self):
+        self.login_customer()
+        self.subscription.renewable_snapshot = True
+        self.subscription.billing_anchor_date = self.today - timedelta(days=28)
+        self.subscription.start_date = self.today - timedelta(days=28)
+        self.subscription.expiry_date = self.today + timedelta(days=2)
+        self.subscription.save(update_fields=["renewable_snapshot", "billing_anchor_date", "start_date", "expiry_date"])
+
+        response = self.client.get(reverse("portal:subscription_detail", args=[self.subscription.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Request renewal")
+
     def test_action_requires_post_and_ignores_posted_customer_id(self):
         self.login_customer()
         url = reverse("portal:subscription_action", args=[self.subscription.pk, "pause"])

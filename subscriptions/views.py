@@ -11,7 +11,7 @@ from accounts.permissions import role_required
 from core.models import QuoteTemplate, Subscription
 from core.services.exceptions import DomainValidationError
 from core.services.lifecycle import (
-    pause_subscription, renew_subscription, resume_subscription,
+    pause_subscription, renewal_is_available, renew_subscription, resume_subscription,
     transition_subscription,
 )
 from offers.services.templates import copy_template_to_subscription, validate_quote_template
@@ -77,10 +77,17 @@ def create(request):
 @role_required(User.Role.ADMIN, User.Role.STAFF)
 def detail(request, subscription_id):
     subscription = get_object_or_404(
-        Subscription.objects.select_related("customer", "plan").prefetch_related("lines__product", "lines__variant", "lines__taxes", "events"),
+        Subscription.objects.select_related("customer", "plan", "successor").prefetch_related("lines__product", "lines__variant", "lines__taxes", "events"),
         pk=subscription_id,
     )
-    return render(request, "subscriptions/detail.html", {"subscription": subscription, "today": timezone.localdate()})
+    return render(request, "subscriptions/detail.html", {
+        "subscription": subscription,
+        "today": timezone.localdate(),
+        "can_request_renewal": (
+            renewal_is_available(subscription)
+            and not hasattr(subscription, "successor")
+        ),
+    })
 
 
 @role_required(User.Role.ADMIN, User.Role.STAFF)

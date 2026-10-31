@@ -161,7 +161,7 @@
     {% endif %}
   {% endif %}
 
-  {% if subscription.renewable_snapshot and subscription.status == 'CLOSED' or subscription.renewable_snapshot and subscription.status == 'ACTIVE' and subscription.expiry_date < today %}
+  {% if can_request_renewal %}
     <form method="post" action="{% url 'subscriptions:action' subscription.pk 'renew' %}">
       {% csrf_token %}
       <button class="button button--secondary" type="submit">Request renewal</button>

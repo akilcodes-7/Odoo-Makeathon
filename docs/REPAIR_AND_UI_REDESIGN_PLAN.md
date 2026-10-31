@@ -2,7 +2,7 @@
 
 Prepared: 31 October 2026, 11:57 IST.
 
-Status: **Plan only; implementation has not started.**
+Status: **Partial implementation in local `Main` at `0e5595b`; A07 renewal eligibility and controls have been corrected and regression checks added. Other repairs and the UI acceptance gates remain incomplete.**
 
 Audited baseline: local `dev`, commit `32f797da48d0173f0a78db40cc6aed498e66e3ae`.
 
@@ -70,7 +70,7 @@ Estimated effort: 60–90 minutes; some work can overlap Phase 1 under disjoint 
 | --- | --- | --- | --- |
 | A05 | Malformed plan IDs cause HTTP 500; subscription creation/editing | Use validated model selections before dependent queries. Handle malformed GET selections with a controlled response. | Invalid text, missing IDs, nonexistent IDs and unavailable plans produce useful errors. Valid selections still populate and save lines. |
 | A06 | Confirmation accepts archived selections; lifecycle validation | Recheck current plan/product/variant eligibility at confirmation. Keep the saved agreement of an already confirmed contract intact. | Archive a selection after quotation and attempt confirmation: it is rejected without a partial transition. Existing confirmed contracts remain usable. |
-| A07 | Final-period renewal is rejected; lifecycle and portal | Derive final-period eligibility from the anchored schedule and purchased service interval. Align internal/customer controls with the shared rule. Enforce nonoverlapping successor dates and truthful successor status. | Renew during the final period, after expiry and after early closure. Verify one successor under repeated/concurrent requests, correct starts, and explicit abandoned-successor messaging. |
+| A07 | Final-period renewal and control visibility | **Implemented locally:** shared eligibility derives the final service period from the billing anchor and is used by lifecycle and both detail pages. Renewal start dates before the current term/purchased period ends are rejected. Regression checks cover the final-period boundary, future confirmed contracts and staff/customer action visibility. | Focused and full suites pass. Full A07 acceptance still needs explicit after-expiry/early-close, duplicate/concurrent-request and abandoned-successor checks. |
 | A08 | Paused auto-close contracts never finalize; billing/lifecycle | Include expired paused contracts in finalization while distinguishing an intentional pause cursor from outstanding billable work. | The contract closes after expiry without charging the paused interval or generating zero-day invoices. Outstanding earlier debt remains payable. |
 | A09 | One inconsistent cursor aborts billing; billing batch | Catch per-subscription cursor validation failures, report the affected contract and continue independent work. Preserve failed cursors. | A malformed contract returns an actionable error while a valid contract in the same batch bills successfully. A repeat does not duplicate successful invoices. |
 | A10 | Simulated future billing uses inconsistent dates; lifecycle/billing | Use the captured billing `as_of` throughout a trusted activation path inside the lifecycle module. Preserve public service contracts and the ordinary UI's current-date behavior. Reconcile error/backlog reporting. | Future `--as-of` activates and bills a due confirmed contract; ordinary activation still rejects a future start. Failed activation is visible in the report. |
