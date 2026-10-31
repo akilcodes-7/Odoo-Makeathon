@@ -5,6 +5,7 @@
 {% block topbar_context %}Finance · Payments{% endblock %}
 {% block page_title %}Payments{% endblock %}
 {% block page_description %}<p class="page-description">Recorded payment history. Balances and invoice statuses update automatically as payments clear.</p>{% endblock %}
+{% block page_actions %}<a class="button button--primary" href="{% url 'finance:invoices' %}?status=CONFIRMED">Choose invoice to record payment</a>{% endblock %}
 
 {% block content %}
 <section class="table-card" aria-label="Payment history">

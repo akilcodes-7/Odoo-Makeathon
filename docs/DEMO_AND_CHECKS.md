@@ -1,5 +1,7 @@
 # Demo, checks, and evaluator evidence
 
+**Current evaluator update — 2026-10-31 14:27 IST:** One-command startup and persisted accounts/data are verified. Full suite: 127 discovered, 124 passed, 3 skipped; separate on-disk concurrency: 3 passed. Fresh isolated source/environment setup and restart preservation passed. Browser admin login/dashboard/payment/team navigation checked at 1280×720. See [evaluator guide](EVALUATOR_GUIDE.md) and the current [lead log](logs/lead.md) for scope and exact results. Remaining viewport and external submission checks are not claimed complete. The audit and earlier counts below are historical evidence for their recorded revisions.
+
 The entries below record actual local checks from 2026-10-31. No external portal or video submission is represented as complete. No generated database or secret is stored in Git.
 
 **Audit update, 11:51 IST:** the passing checks below are historical evidence for their specific cases. A new [functional audit](AUDIT_2026-10-31.md) reproduced ten defects, including primary catalog and contract-freezing failures. Full functionality is not verified. The audit rerun discovered 96 tests: 93 passed and 3 skipped; dedicated on-disk concurrency checks passed all 3. No application fixes have yet been applied.

@@ -9,6 +9,11 @@ from core.services.billing import run_due_billing
 
 
 @role_required(User.Role.ADMIN, User.Role.STAFF)
+def billing_index(request):
+    return redirect("finance:invoices")
+
+
+@role_required(User.Role.ADMIN, User.Role.STAFF)
 def run_billing_view(request):
     if request.method != "POST":
         raise PermissionDenied("Billing runs require POST.")

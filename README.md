@@ -6,6 +6,20 @@ A Django application for managing products, recurring plans, subscriptions, invo
 
 ## Quick start
 
+For evaluators, install Python 3.12+ and Git, then run:
+
+```bash
+git clone --branch Main https://github.com/akilcodes-7/Odoo-Makeathon.git
+cd Odoo-Makeathon
+python3 scripts/run_demo.py
+```
+
+On Windows, use `py -3.12 scripts/run_demo.py`. This command installs dependencies, migrates a separate `.demo/db.sqlite3`, creates four working accounts and a populated evaluation dataset, then starts the app at **http://127.0.0.1:8000/**. Internet is required for the first dependency installation. Read **`.demo/access.txt`** for the generated sign-in password. Rerunning the command preserves your records and passwords. Use `--port 8001` if port 8000 is busy; `--prepare-only` prepares data without starting a server.
+
+Follow [the evaluator walkthrough](docs/EVALUATOR_GUIDE.md) for a complete quote-to-payment demo, customer signup, staff accounts, renewal and pause/resume. Email is written to `.demo/emails/` for inspection; no messages or payments are sent externally. `.demo/` is excluded from Git.
+
+### Manual developer setup
+
 ```bash
 git clone --branch Main https://github.com/akilcodes-7/Odoo-Makeathon.git
 cd Odoo-Makeathon
@@ -26,7 +40,7 @@ Open **http://127.0.0.1:8000** and log in with one of the demo accounts below.
 
 ## Demo accounts & credentials
 
-The first `seed_demo` run asks you to choose one local password for the demo accounts. Use the password you chose when signing in; the repository does not ship a shared demo password.
+The evaluator launcher generates a local password in `.demo/access.txt`. With the manual setup instead, `seed_demo` asks you to choose the password. Both setups use the account emails below; no shared password is shipped in the repository.
 
 | Role       | Email                        | Organization / Name          |
 |------------|------------------------------|------------------------------|

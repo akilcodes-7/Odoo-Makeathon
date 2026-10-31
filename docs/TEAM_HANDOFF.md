@@ -1,6 +1,6 @@
 # Current handoff — implementation integration
 
-**Last recorded update:** 2026-10-31 13:44 IST. The current checkout is `Main` at `0e5595b`; read-only remote verification found `origin/Main` and `origin/dev` at the same commit, with `Main` as the default branch. This supersedes the historical lowercase-`dev` handoff below. A07 renewal eligibility and staff/customer controls are corrected locally. The full suite now discovers 123 tests: 120 passed and 3 concurrency tests skipped on in-memory SQLite; the focused on-disk concurrency suite previously passed all 3. Django checks, migration drift and diff whitespace checks pass. No changes have been pushed. A01–A06, A08–A10 and visual acceptance remain open. See the [repair/UI plan](REPAIR_AND_UI_REDESIGN_PLAN.md) and [audit](AUDIT_2026-10-31.md).
+**Last recorded update:** 2026-10-31 14:27 IST. Current work is I1 evaluator preparation on `Main`, based on published `2ded2a6` (A07 fix). The earlier `41ebeea` contains functional audit repairs and `0e5595b` the UI redesign. This update adds one-command startup, four local accounts, persistent evaluation data and tested end-to-end forms. Full suite: 127 discovered, 124 passed and 3 skipped; separate on-disk concurrency: all 3 passed. Fresh source/environment setup and repeat-start preservation pass. See [evaluator guide](EVALUATOR_GUIDE.md) and [lead log](logs/lead.md). Older audit/open-status statements below are historical and must not be treated as a new audit against this build. Full visual acceptance and external submission evidence remain incomplete.
 
 ## Team starting point
 
@@ -15,7 +15,7 @@ Read `docs/REPAIR_AND_UI_REDESIGN_PLAN.md` first, then the assigned audit findin
 
 [Hard deadline tracker](DEADLINES.md): the 09:00 repository link and 10:00 evaluator access deadlines have passed. Repository URL is live; portal receipt and `hapt-odoo`/`hackathon-odoo` collaborator invitations remain unverified. Akilan is the provisional portal submitter; verify actual permissions.
 
-## Actual state and verified limits
+## Historical integration state and previously recorded limits
 
 - **Audit overrides blanket completion claims:** product creation, tax and failed-form money handling, stale draft protection, paused expiry, and billing error/date handling still need attention. A07 renewal handling was repaired locally with boundary, permissions/control-visibility checks; its original finding remains documented as a baseline reproduction. Current suite: 123 discovered, 120 passed, 3 skipped; dedicated on-disk concurrency suite: 3 passed before this A07-only change. Detailed findings are in `AUDIT_2026-10-31.md`.
 - S1 auth/reset/roles, S2 catalog CRUD, S3 subscriptions/lifecycle, S4 recurring billing/invoice states, T1A discounts, T1B templates, T2A payments, T2B send/print, T3A reporting, T3B portal, and S5 scale fixture/benchmark are implemented. Detailed evidence is in `docs/DEMO_AND_CHECKS.md` and `docs/REQUIREMENTS.md`.
@@ -33,13 +33,13 @@ Read `docs/REPAIR_AND_UI_REDESIGN_PLAN.md` first, then the assigned audit findin
 
 | Owner | Branch target | Cards | Actual status | Blocker/next action |
 | --- | --- | --- | --- | --- |
-| Lead / repo owner | `Main` | A07 repair; other S0–S5/integration work | A07 implemented locally on top of `0e5595b`; 123 tests discovered, 120 pass and 3 skip. Not pushed. Remaining audit findings and UI acceptance are incomplete. | Continue with A01–A06/A08–A10 in repair-plan order; preserve shared lifecycle/billing/subscription ownership. |
+| Lead / repo owner | `Main` | I1 evaluator integration; A07 | One-command setup, persistent data/accounts and workflow verification complete locally; 124 default tests + 3 separate concurrency checks passed. | Publish tested evaluator update; rehearse the guide. Remaining viewport and external submission gates are not certified. |
 | Teammate 1 scope | `dev` | T1A, T1B | Services and template flow exist; audit A03 reproduces discount money/percentage redisplay corruption. Existing passing tests do not cover failed-form resubmission. | Fix A03 under assigned ownership; follow the repair/UI plan. No human Git activity attributed. |
 | Teammate 2 scope | `dev` | T2A, T2B | Payment service/UI and invoice send/print implemented; payment/delivery tests and payment concurrency pass. | Finance UI rollout and integration verification under assigned ownership; no human Git activity attributed. |
 | Teammate 3 scope | `dev` | T3A, T3B | Reporting/portal checks pass, but renewal presentation, invoice bounds and visual acceptance remain incomplete. | Follow portal/UI repairs and required viewport checks; no human Git activity attributed. |
 | Akilan (provisional portal submitter) | N/A | Submission, V1 | External portal submission/access/video status unknown. | Verify portal receipt, evaluator access and video submission by the stated deadlines. |
 
-## Fill these from verified implementation before handoff
+## Historical handoff evidence (use current update above)
 
 | Item | Actual value |
 | --- | --- |
