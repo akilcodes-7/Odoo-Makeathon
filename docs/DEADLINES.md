@@ -11,7 +11,7 @@ These deadlines were supplied by the participant and supersede the earlier relat
 
 ## Immediate priority
 
-At 10:54 IST, both the 09:00 repository-link and 10:00 evaluator-access deadlines had passed. The repository URL is public, but the portal submission receipt and collaborator invitations remain unverified. Read-only remote inspection during integration confirmed `dev` at `4ac796839434cf0570aa0ed451fc86c635acda74`; local code commit `0b436d9` is on `codex/remaining-core` and has not been pushed. Ask Akilan/the portal to confirm the saved submission and check whether the organizer accepts late evaluator invitations. Do not fabricate a receipt or backdate an invitation.
+At 10:54 IST, both the 09:00 repository-link and 10:00 evaluator-access deadlines had passed. The repository URL is public, but the portal submission receipt and collaborator invitations remain unverified. Integration later confirmed the original `dev` base at `4ac7968`; implementation commit `0b436d9` and docs commit `cee28fb` were pushed to task branch and `dev` at 11:29 IST. Ask Akilan/the portal to confirm the saved submission and check whether the organizer accepts late evaluator invitations. Do not fabricate a receipt or backdate an invitation.
 
 The verified public repository is https://github.com/akilcodes-7/Odoo-Makeathon. Its `dev` branch last read as `4ac7968`; the remote default branch is `plan-submission-17140653490169652980` and was not modified. The local `main` branch remains unchanged.
 
@@ -43,7 +43,7 @@ Recording length/platform are not specified by the supplied rules. Check the por
 | `hapt-odoo` invitation/access status and time | Pending |
 | `hackathon-odoo` invitation/access status and time | Pending |
 | Required collaborator permission level | Pending portal instruction |
-| Last verified published baseline | `4ac7968` on `dev` (remote read verified during integration); local feature commit `0b436d9` is not yet merged/pushed. |
+| Last verified published baseline | Implementation commit `0b436d9` and documentation commit `cee28fb` integrated on `dev`; task branch and `dev` both read-verified at `cee28fb` after push at 11:29 IST. |
 | Video URL and playback/access check | Pending |
 | Video submission time and receipt | Pending |
 

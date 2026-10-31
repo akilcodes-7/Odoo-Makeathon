@@ -62,7 +62,7 @@ To create a repeat-safe local benchmark dataset, run `python manage.py seed_scal
 
 ## Evaluation evidence
 
-All completion claims should link to actual commits, PRs, screenshots, or captured check results. Current results and limitations are in [the demo/check record](docs/DEMO_AND_CHECKS.md) and [requirements](docs/REQUIREMENTS.md). The feature implementation is on local branch `codex/remaining-core` at commit `0b436d9`; remote `dev` was verified at `4ac7968` before integration. The feature commit has not been merged or pushed yet.
+All completion claims should link to actual commits, PRs, screenshots, or captured check results. Current results and limitations are in [the demo/check record](docs/DEMO_AND_CHECKS.md) and [requirements](docs/REQUIREMENTS.md). Implementation commit `0b436d9` and documentation commit `cee28fb` are on `codex/remaining-core` and `dev`; both branches were pushed and read-verified at `cee28fb`. The remote default branch remains unchanged.
 
 ## Source material
 

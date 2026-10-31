@@ -76,6 +76,13 @@ All times are Asia/Kolkata (IST). Planned times are kept in the implementation p
 - **Git state:** Remote `dev` had just been fetched and exactly matched local `dev` at `4ac7968`; default branch remains separate. Commit is not pushed or merged yet. Documentation evidence remains modified for its own commit.
 - **Next:** Commit the documentation update, re-fetch `dev`, fast-forward local `dev` only if it still matches the verified base, then push the authorized task branch and `dev` if authentication is available and cutoff allows.
 
+## 2026-10-31 11:29 IST — Integrated branch pushed and verified
+
+- **Integration:** Re-fetched remote immediately before merge; `origin/dev` still matched `4ac7968`. Fast-forwarded local `dev` from the feature branch, preserving commit history.
+- **Push:** Pushed `codex/remaining-core` and `dev` to the requested repository. Remote read-back showed both at `cee28fb908ea88e96f3500ffaab172f32d20fa64`; default `plan-submission-17140653490169652980` remained at `ca69b4b330e75d4070b92376993df74b2200c5db` and was unchanged.
+- **Commits:** Implementation `0b436d9a9495fe99f43b929224301603935a6687`; documentation `cee28fb908ea88e96f3500ffaab172f32d20fa64`. Both use the repository-configured Git identity; no separate teammate identity or review is claimed.
+- **Next:** Record this remote verification in the handoff, commit/push that docs-only update to both authorized branches, and retain remaining visual/external submission limitations.
+
 ## Entry template
 
 Copy this for actual progress; replace all placeholders and remove irrelevant lines:

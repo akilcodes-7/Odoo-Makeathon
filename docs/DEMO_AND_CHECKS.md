@@ -38,7 +38,7 @@ Creating local documents does not complete these remote submission steps.
 | UI | 390/768/1440px, keyboard, focus, reduced motion, useful errors | Local browser rendered customer dashboard at its available 890×921 viewport. CSS/JS implement responsive drawer, Escape/focus handling, 44×44 menu target, and reduced motion. Exact 390/768/1440 screenshots and full keyboard/contrast audit remain unverified. |
 | Offline | Local assets/db/email fallback; no network needed after install | Static styles/scripts are local; Django console email default. Fresh offline install was not tested (dependency packages may require package access). |
 | Performance | 5,000 subscriptions plus related records; server and browser measurements | Backend measurement passed all five routes under 2s; details below. Full browser rendering and concurrent load were not measured. |
-| Git | Each contributor's actual branches, commits, PR reviews | Remote refs read successfully: `dev`=`4ac7968`; default=`plan-submission-17140653490169652980`. Local implementation commit `0b436d9` is on `codex/remaining-core` using the repository-configured author. No PR/review or separate human teammate commits are recorded; branch merge/push remains pending. |
+| Git | Each contributor's actual branches, commits, PR reviews | Remote refs read after push: `dev` and `codex/remaining-core` both `cee28fb`; default=`plan-submission-17140653490169652980` unchanged. Implementation commit `0b436d9` and docs commit `cee28fb` use repository-configured author. No PR/review or separate human teammate commits are recorded. |
 
 ## Integrated verification — 2026-10-31
 

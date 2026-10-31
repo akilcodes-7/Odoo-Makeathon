@@ -48,5 +48,11 @@ Role: solo morning spine; afternoon reviews/integration/shared code. Branch targ
 - **Checks:** Before commit, all 96 tests passed with three in-memory concurrency skips; dedicated on-disk concurrency suite passed 3; Django check, no-migration check, whitespace and JS syntax checks passed.
 - **Git state:** `origin/dev` fetched at `4ac7968`, matching local `dev`. The remote default branch was not touched. Feature commit remains local pending docs commit and push.
 
+## 2026-10-31 11:29 IST — Fast-forward and remote verification
+
+- **Integration:** Immediately refetched `origin/dev` at `4ac7968`, then fast-forwarded local `dev` to the task branch. No merge conflict or rewrite.
+- **Push/read-back:** Pushed `codex/remaining-core` and `dev`; `git ls-remote --symref` confirmed both point to `cee28fb908ea88e96f3500ffaab172f32d20fa64`. Default branch remained `plan-submission-17140653490169652980` at `ca69b4b330e75d4070b92376993df74b2200c5db`.
+- **Remaining:** Commit the current docs-only remote status update; verify final refs/clean tree. No code changes after the documented test run. Responsive screenshot and external portal/video checks remain pending.
+
 Entry format: IST timestamp; card; what changed/why; files; checks/results; commit/PR; blocker; next owner/action.
 
